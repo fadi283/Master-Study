@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EN101 شرح قواعد اللغة الإنجليزية التفاعلي </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices:
+        - Verb Tenses: Text explanations, examples. Interactive fill-in-the-blanks and multiple-choice exercises. Goal: Reinforce understanding of tense forms and usage for exam readiness. Method: HTML forms, JS for validation and feedback.
+        - Passive/Active Voice: Text explanations, examples. Interactive sentence conversion exercises (active to passive) and multiple-choice. Goal: Practice identifying and forming passive/active sentences. Method: HTML forms, JS.
+        - Comparatives/Superlatives: Text explanations, examples. Interactive fill-in-the-blanks and multiple-choice. Goal: Practice forming and using comparatives/superlatives. Method: HTML forms, JS.
+        - Subject-Verb Agreement: Text explanations, examples. Interactive verb selection exercises and multiple-choice. Goal: Practice subject-verb agreement rules, a common exam topic. Method: HTML forms, JS.
+        - Prepositions: Text explanations, list of prepositions, verb/adjective + preposition combinations. Multiple-choice exercises. Goal: Familiarize with preposition usage, often tested in exams. Method: HTML forms, JS.
+        - Articles: Text explanations, rules, examples. Interactive article insertion exercises and multiple-choice. Goal: Practice correct article usage, a subtle but important exam area. Method: HTML forms, JS.
+        - All interactions will use Vanilla JS. No SVG/Mermaid.
+    -->
+    <style>
+        body { font-family: 'Inter', 'Almarai', sans-serif; }
+        .lesson-content p, .lesson-content li { margin-bottom: 0.75rem; line-height: 1.75; }
+        .lesson-content h3 { margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.25rem; font-weight: 600; }
+        .lesson-content h4 { margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1.1rem; font-weight: 600; }
+        .example { background-color: #eef2ff; border-left: 4px solid #6366f1; padding: 0.75rem; margin-bottom: 0.75rem; border-radius: 0.25rem; }
+        .exercise-item { border: 1px solid #e5e7eb; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; background-color: #f9fafb; }
+        .feedback { padding: 0.5rem; margin-top: 0.5rem; border-radius: 0.25rem; font-weight: 500; }
+        .feedback.correct { background-color: #d1fae5; color: #065f46; }
+        .feedback.incorrect { background-color: #fee2e2; color: #991b1b; }
+        [lang="en"] { direction: ltr; }
+        [lang="ar"] { direction: rtl; }
+        .active-nav-link { background-color: #38bdf8; color: white; }
+        .nav-link { display: block; padding: 0.75rem 1rem; margin-bottom: 0.25rem; border-radius: 0.375rem; transition: background-color 0.2s ease-in-out; }
+        .nav-link:hover { background-color: #7dd3fc; }
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-amber-50 text-slate-800">
+    <div id="app-container" class="flex flex-col md:flex-row min-h-screen">
+        <nav id="sidebar" class="w-full md:w-72 bg-sky-500 text-white p-4 space-y-2 shadow-lg md:sticky md:top-0 md:h-screen md:overflow-y-auto">
+            <h2 id="nav-title" class="text-2xl font-bold mb-6 text-center">EN101 قائمة الدروس</h2>
+            <button data-lessonid="verbTenses" class="nav-link text-right w-full">أزمنة الأفعال</button>
+            <button data-lessonid="passiveActive" class="nav-link text-right w-full">المبني للمعلوم والمجهول</button>
+            <button data-lessonid="comparativeSuperlative" class="nav-link text-right w-full">المقارنة والتفضيل</button>
+            <button data-lessonid="subjectVerbAgreement" class="nav-link text-right w-full">توافق الفاعل والفعل</button>
+            <button data-lessonid="prepositions" class="nav-link text-right w-full">حروف الجر</button>
+            <button data-lessonid="articles" class="nav-link text-right w-full">أدوات التعريف والتنكير</button>
+             <div class="mt-auto pt-4">
+                <button id="language-toggle" class="w-full bg-sky-700 hover:bg-sky-800 text-white font-semibold py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                    Switch to English
+                </button>
+            </div>
+        </nav>
+
+        <main id="main-content" class="flex-1 p-6 md:p-10 overflow-y-auto bg-white shadow-inner">
+            <div id="lesson-title" class="text-3xl font-bold mb-6 text-sky-700 border-b-2 border-sky-200 pb-2"></div>
+            <div id="lesson-content-area" class="lesson-content">
+                </div>
+        </main>
+    </div>
+
+    <script>
+        const appData = {
+            currentLanguage: 'ar',
+            lessons: {
+                verbTenses: {
+                    title: { en: "Verb Tenses", ar: "أزمنة الأفعال" },
+                    content: [
+                        { type: 'paragraph', en: "You should be acquainted with the verb tense forms and try to avoid some impossible verb forms. There are 12 tenses in the English language.", ar: "يجب أن تكون على دراية بأشكال أزمنة الأفعال ومحاولة تجنب بعض أشكال الأفعال المستحيلة. هناك 12 زمنًا في اللغة الإنجليزية." },
+                        { type: 'subheading', en: "1. Simple Present Tense", ar: "1. المضارع البسيط" },
+                        { type: 'text', en: "Form: eat, eats, (doesn't, don't) eat.", ar: "الشكل: eat, eats, (doesn't, don't) eat." },
+                        { type: 'text', en: "Use: This tense is usually not used to indicate present tense. However, it is used to indicate present time (now) with the following stative verbs: know, believe, hear, see, smell, wish, understand, hate, love, like, want, sound, have, need, appear, seem, taste, own. The simple present tense is used to indicate a regular or habitual action.", ar: "الاستخدام: لا يستخدم هذا الزمن عادة للإشارة إلى الزمن الحاضر. ومع ذلك، فإنه يستخدم للإشارة إلى الوقت الحاضر (الآن) مع الأفعال الحالة التالية: know, believe, hear, see, smell, wish, understand, hate, love, like, want, sound, have, need, appear, seem, taste, own. يستخدم زمن المضارع البسيط للإشارة إلى فعل منتظم أو معتاد." },
+                        { type: 'example', en: ["John walks to school every day.", "They understand the problem now.", "Henry always swims in the evening."], ar: ["جون يمشي إلى المدرسة كل يوم.", "هم يفهمون المشكلة الآن.", "هنري يسبح دائمًا في المساء."] },
+                        { type: 'subheading', en: "2. Present Progressive (Continuous)", ar: "2. المضارع المستمر" },
+                        { type: 'text', en: "Form: (is, am, are) eating, (isn't, aren't, am not) eating.", ar: "الشكل: (is, am, are) eating, (isn't, aren't, am not) eating." },
+                        { type: 'text', en: "Use: It is used to indicate present time (now) with all but the stative verbs listed previously.", ar: "الاستخدام: يستخدم للإشارة إلى الوقت الحاضر (الآن) مع جميع الأفعال باستثناء الأفعال الحالة المذكورة سابقًا." },
+                        { type: 'example', en: ["John is eating dinner now.", "The committee members are examining the material now.", "Look! it is snowing.", "Listen! They are arguing."], ar: ["جون يتناول العشاء الآن.", "أعضاء اللجنة يفحصون المواد الآن.", "انظر! إنها تثلج.", "استمع! إنهم يتجادلون."] },
+                        { type: 'subheading', en: "3. Present Perfect Tense", ar: "3. المضارع التام" },
+                        { type: 'text', en: "Form: (have, has) eaten, (hasn't, haven't) eaten.", ar: "الشكل: (have, has) eaten, (hasn't, haven't) eaten." },
+                        { type: 'text', en: "Use: The present perfect is used in the following cases: 1. An action that happened at an indefinite time in the past. 2. An action that happened more than once in the past. 3. An action that started in the past and is still occurring in the present.", ar: "الاستخدام: يستخدم المضارع التام في الحالات التالية: 1. فعل حدث في وقت غير محدد في الماضي. 2. فعل حدث أكثر من مرة في الماضي. 3. فعل بدأ في الماضي وما زال مستمرًا في الحاضر." },
+                        { type: 'example', en: ["John has traveled around the world. (We don't know when).", "I have seen the movie three times this year.", "John has lived in the same house for twenty years. (He still lives there)."], ar: ["جون سافر حول العالم. (لا نعرف متى).", "لقد رأيت الفيلم ثلاث مرات هذا العام.", "جون عاش في نفس المنزل لمدة عشرين عامًا. (لا يزال يعيش هناك)."] },
+                        { type: 'subheading', en: "Keywords for Present Perfect", ar: "كلمات مفتاحية للمضارع التام" },
+                        { type: 'text', en: "A. FOR/SINCE: Use for+duration of time (for five hours); Use since + beginning time (since 1975).", ar: "أ. FOR/SINCE: استخدم for + مدة زمنية (لمدة خمس ساعات)؛ استخدم since + وقت البداية (منذ عام 1975)." },
+                        { type: 'text', en: "B. YET/ALREADY: 'Already' is used with affirmative sentences (We have already written our reports). 'Yet' is used in negative sentences and questions (We haven't written our reports yet).", ar: "ب. YET/ALREADY: تستخدم 'Already' مع الجمل الإيجابية (لقد كتبنا تقاريرنا بالفعل). تستخدم 'Yet' في الجمل السلبية والأسئلة (لم نكتب تقاريرنا بعد)." },
+                        { type: 'text', en: "C. ALWAYS: Used when you want to indicate an action that you have always wanted to do, or be (I have always wanted to visit the Pyramids).", ar: "ج. ALWAYS: تستخدم عندما تريد الإشارة إلى فعل كنت ترغب دائمًا في القيام به، أو أن تكون (لقد أردت دائمًا زيارة الأهرامات)." },
+                        { type: 'text', en: "D. SO FAR: Indicates an action that started in the past and continues till now (The government has built three housing buildings so far).", ar: "د. SO FAR: تشير إلى فعل بدأ في الماضي وما زال مستمرًا حتى الآن (لقد بنت الحكومة ثلاثة مبانٍ سكنية حتى الآن)." },
+                        { type: 'subheading', en: "4. Present Perfect Continuous Tense", ar: "4. المضارع التام المستمر" },
+                        { type: 'text', en: "Form: (has, have) been eating, (hasn't, haven't) been eating.", ar: "الشكل: (has, have) been eating, (hasn't, haven't) been eating." },
+                        { type: 'text', en: "Use: It indicates an action that began in the past and is still occurring in the present.", ar: "الاستخدام: يشير إلى فعل بدأ في الماضي وما زال مستمرًا في الحاضر." },
+                        { type: 'example', en: ["John has been working in Washington for three years. (he is still working)."], ar: ["جون يعمل في واشنطن منذ ثلاث سنوات. (لا يزال يعمل)."] },
+                        { type: 'subheading', en: "5. Simple Past Tense", ar: "5. الماضي البسيط" },
+                        { type: 'text', en: "Form: ate, didn't eat.", ar: "الشكل: ate, didn't eat." },
+                        { type: 'text', en: "Use: The simple past is used to indicate a completed action that happened at one specific time in the past. Keywords: ago, last year, yesterday, in 1990, etc.", ar: "الاستخدام: يستخدم الماضي البسيط للإشارة إلى فعل مكتمل حدث في وقت محدد في الماضي. الكلمات المفتاحية: ago, last year, yesterday, in 1990, إلخ." },
+                        { type: 'example', en: ["John went to Spain last year.", "Bob bought a new bicycle yesterday.", "Maria did her homework last night.", "Mark washed the dishes after dinner.", "George cooked dinner for his family Saturday night."], ar: ["جون ذهب إلى إسبانيا العام الماضي.", "بوب اشترى دراجة هوائية جديدة بالأمس.", "ماريا قامت بواجبها المنزلي الليلة الماضية.", "مارك غسل الأطباق بعد العشاء.", "جورج طبخ العشاء لعائلته ليلة السبت."] },
+                        { type: 'subheading', en: "6. Past Continuous Tense", ar: "6. الماضي المستمر" },
+                        { type: 'text', en: "Form: (was, were) eating, (weren't, wasn't) eating.", ar: "الشكل: (was, were) eating, (weren't, wasn't) eating." },
+                        { type: 'text', en: "Use: The past continuous is used to indicate an action that was occurring in the past and was interrupted by another action. Also used to indicate an action that was occurring at the same time with another action in the past.", ar: "الاستخدام: يستخدم الماضي المستمر للإشارة إلى فعل كان يحدث في الماضي وتمت مقاطعته بفعل آخر. يستخدم أيضًا للإشارة إلى فعل كان يحدث في نفس الوقت مع فعل آخر في الماضي." },
+                        { type: 'example', en: ["Martha was watching television when Mark came home.", "Martha was watching television while John was studying."], ar: ["مارثا كانت تشاهد التلفاز عندما عاد مارك إلى المنزل.", "مارثا كانت تشاهد التلفاز بينما جون كان يدرس."] },
+                        { type: 'subheading', en: "7. Past Perfect Tense", ar: "7. الماضي التام" },
+                        { type: 'text', en: "Form: had eaten, hadn't eaten.", ar: "الشكل: had eaten, hadn't eaten." },
+                        { type: 'text', en: "Use: It is used to indicate an action that happened before another action in the past; there are two actions in the sentence.", ar: "الاستخدام: يستخدم للإشارة إلى فعل حدث قبل فعل آخر في الماضي؛ هناك فعلان في الجملة." },
+                        { type: 'example', en: ["I had gone to the store before I went home.", "After John had gone to the store, he went home.", "Before John went home, he had gone to the store."], ar: ["كنت قد ذهبت إلى المتجر قبل أن أذهب إلى المنزل.", "بعد أن ذهب جون إلى المتجر، ذهب إلى المنزل.", "قبل أن يذهب جون إلى المنزل، كان قد ذهب إلى المتجر."] },
+                        { type: 'subheading', en: "8. Past Perfect Continuous Tense", ar: "8. الماضي التام المستمر" },
+                        { type: 'text', en: "Form: had been eating, hadn't been eating.", ar: "الشكل: had been eating, hadn't been eating." },
+                        { type: 'text', en: "Use: It is used to indicate an action that happened before another action in the past, but action (1) led to action (2). Keywords: before or after + for or since.", ar: "الاستخدام: يستخدم للإشارة إلى فعل حدث قبل فعل آخر في الماضي، ولكن الفعل الأول أدى إلى الفعل الثاني. الكلمات المفتاحية: before أو after + for أو since." },
+                        { type: 'example', en: ["Abdu had been living in New York for ten years before he moved to California.", "George had been working at the university for forty-five years before he retired."], ar: ["عبده كان يعيش في نيويورك لمدة عشر سنوات قبل أن ينتقل إلى كاليفورنيا.", "جورج كان يعمل في الجامعة لمدة خمسة وأربعين عامًا قبل أن يتقاعد."] },
+                        { type: 'subheading', en: "9. Simple Future Tense", ar: "9. المستقبل البسيط" },
+                        { type: 'text', en: "Form: 'will' vs. 'be going to'.", ar: "الشكل: 'will' مقابل 'be going to'." },
+                        { type: 'text', en: "Use: 1. To express a prediction, either will or be going to is used. 2. To express a prior plan: only BE GOING TO is used. 3. To express willingness: only WILL is used.", ar: "الاستخدام: 1. للتعبير عن التنبؤ، يستخدم will أو be going to. 2. للتعبير عن خطة مسبقة: يستخدم BE GOING TO فقط. 3. للتعبير عن الاستعداد: يستخدم WILL فقط." },
+                        { type: 'example', en: ["According to the weather report, it will/is going to be cloudy tomorrow.", "I talked to Bob yesterday. He's going to buy a car. That's what he told me.", "Ask the teacher for help. She'll help you."], ar: ["وفقًا لتقرير الطقس، سيكون غائمًا غدًا.", "تحدثت إلى بوب بالأمس. إنه سيشتري سيارة. هذا ما قاله لي.", "اطلب المساعدة من المعلمة. ستساعدك."] },
+                        { type: 'subheading', en: "10. Future Progressive Tense", ar: "10. المستقبل المستمر" },
+                        { type: 'text', en: "Form: will be eating, won't be eating.", ar: "الشكل: will be eating, won't be eating." },
+                        { type: 'text', en: "Use: It expresses an activity that will be in progress at a time in the future.", ar: "الاستخدام: يعبر عن نشاط سيكون مستمرًا في وقت ما في المستقبل." },
+                        { type: 'example', en: ["Right now, I am sitting in class. At this time tomorrow, I will be sitting in class."], ar: ["الآن، أنا جالس في الفصل. في مثل هذا الوقت غدًا، سأكون جالسًا في الفصل."] },
+                        { type: 'subheading', en: "11. Future Perfect Tense", ar: "11. المستقبل التام" },
+                        { type: 'text', en: "Form: will have eaten, won't have eaten.", ar: "الشكل: will have eaten, won't have eaten." },
+                        { type: 'text', en: "Use: It expresses an activity that will be completed before another time or event in the future.", ar: "الاستخدام: يعبر عن نشاط سيكون قد اكتمل قبل وقت أو حدث آخر في المستقبل." },
+                        { type: 'example', en: ["I will have finished my homework by the time I go out on a date tonight."], ar: ["سأكون قد أنهيت واجبي بحلول الوقت الذي أخرج فيه في موعد الليلة."] },
+                        { type: 'subheading', en: "12. Future Perfect Continuous Tense", ar: "12. المستقبل التام المستمر" },
+                        { type: 'text', en: "Form: will/won't have been eating.", ar: "الشكل: will/won't have been eating." },
+                        { type: 'text', en: "Use: The future perfect progressive emphasizes the duration of an activity that will be in progress before another time or event in the future.", ar: "الاستخدام: يؤكد المستقبل التام المستمر على مدة نشاط سيكون مستمرًا قبل وقت أو حدث آخر في المستقبل." },
+                        { type: 'example', en: ["I will go to bed at 10 p.m. He will get home at midnight. At midnight, I will be sleeping for two hours by the time he gets home."], ar: ["سأذهب إلى الفراش في الساعة 10 مساءً. سيعود إلى المنزل في منتصف الليل. في منتصف الليل، سأكون نائمًا لمدة ساعتين بحلول الوقت الذي يصل فيه إلى المنزل."] },
+                        { type: 'subheading', en: "Remember the following rules for verbs:", ar: "تذكر القواعد التالية للأفعال:" },
+                        { type: 'list', en: [
+                            "1. The auxiliary verb 'Have' is followed by the past participle, whether it is used as: Part of a finite verb: We have seen that movie three times. A participle: Having seen the movie three times, we really didn't want to see it again. An infinitive: He was glad to have seen the movie so that he couldn't follow the discussion on it.",
+                            "2. The verb 'be' is followed by: A present participle in the progressive tenses: Kate has been writing her book for the last five years. John will be joining us for lunch tomorrow. A past participle in the passive: The books were given to the students on the first day of class. All accidents must be reported to the medical offices immediately. An infinitive with the meaning of must, or the meaning of an unreal present conditional: Students are to report to the foreign student advisor as soon as they arrive in the country. If we were to leave at five, we would get there on time.",
+                            "3. A modal verb is always followed by the simple form of the verb without the word 'to': Citizens should play an active role in the election of their political leaders. We might have been living in that house at the time, but I honestly don't remember. An apparent exception to this modal is 'ought to': You ought to pay more attention to pedestrians when you drive."
+                        ], ar: [
+                            "1. الفعل المساعد 'Have' يتبعه التصريف الثالث للفعل، سواء استخدم كـ: جزء من فعل تام: We have seen that movie three times. (لقد رأينا ذلك الفيلم ثلاث مرات.) اسم فعل: Having seen the movie three times, we really didn't want to see it again. (بعد رؤية الفيلم ثلاث مرات، لم نكن نرغب حقًا في رؤيته مرة أخرى.) مصدر: He was glad to have seen the movie so that he couldn't follow the discussion on it. (كان سعيدًا لرؤية الفيلم حتى لا يتمكن من متابعة النقاش حوله.)",
+                            "2. الفعل 'be' يتبعه: اسم فعل مضارع في الأزمنة المستمرة: Kate has been writing her book for the last five years. (كيت تكتب كتابها منذ خمس سنوات.) John will be joining us for lunch tomorrow. (جون سينضم إلينا لتناول الغداء غدًا.) اسم مفعول في المبني للمجهول: The books were given to the students on the first day of class. (أعطيت الكتب للطلاب في اليوم الأول من الفصل.) All accidents must be reported to the medical offices immediately. (يجب الإبلاغ عن جميع الحوادث إلى المكاتب الطبية فورًا.) مصدر بمعنى 'يجب'، أو بمعنى شرط غير حقيقي في المضارع: Students are to report to the foreign student advisor as soon as they arrive in the country. (يجب على الطلاب الإبلاغ عن أنفسهم لمستشار الطلاب الأجانب بمجرد وصولهم إلى البلاد.) If we were to leave at five, we would get there on time. (إذا غادرنا في الخامسة، لوصلنا في الوقت المحدد.)",
+                            "3. الفعل المساعد (Modal verb) يتبعه دائمًا الشكل البسيط للفعل بدون كلمة 'to': Citizens should play an active role in the election of their political leaders. (يجب على المواطنين لعب دور نشط في انتخاب قادتهم السياسيين.) We might have been living in that house at the time, but I honestly don't remember. (ربما كنا نعيش في ذلك المنزل في ذلك الوقت، لكنني بصراحة لا أتذكر.) استثناء واضح لهذا الفعل المساعد هو 'ought to': You ought to pay more attention to pedestrians when you drive. (يجب عليك الانتباه أكثر للمشاة عند القيادة.)"
+                        ]}
+                    ],
+                    exercises: [
+                        {
+                            id: 'vt_ex1_1', type: 'fillInTheBlank',
+                            instruction: { en: "Use either the simple present or the present progressive of the verbs in parentheses.", ar: "استخدم إما المضارع البسيط أو المضارع المستمر للأفعال بين القوسين." },
+                            question: { en: "1. Diane can't come to the phone because she (wash) _______ her hair.", ar: "1. ديان لا تستطيع المجيء إلى الهاتف لأنها (تغسل) _______ شعرها." },
+                            answer: "is washing",
+                            explanation: { en: "The action is happening now and is ongoing, so Present Progressive is used.", ar: "الفعل يحدث الآن ومستمر، لذا يستخدم المضارع المستمر." }
+                        },
+                        {
+                            id: 'vt_ex1_2', type: 'fillInTheBlank',
+                            instruction: { en: "Use either the simple present or the present progressive of the verbs in parentheses.", ar: "استخدم إما المضارع البسيط أو المضارع المستمر للأفعال بين القوسين." },
+                            question: { en: "2. Diane (wash) _______ her hair every other day or so.", ar: "2. ديان (تغسل) _______ شعرها كل يومين أو نحو ذلك." },
+                            answer: "washes",
+                            explanation: { en: "This is a habitual action, so Simple Present is used.", ar: "هذا فعل معتاد، لذا يستخدم المضارع البسيط." }
+                        },
+                        {
+                            id: 'vt_ex1_3', type: 'fillInTheBlank',
+                            instruction: { en: "Use either the simple present or the present progressive of the verbs in parentheses.", ar: "استخدم إما المضارع البسيط أو المضارع المستمر للأفعال بين القوسين." },
+                            question: { en: "3. Kathy (sit, usually) _______ in the front row during class, but today she (sit) _______ in the last row.", ar: "3. كاثي (usually sit) _______ in the front row during class, but today she (sit) _______ in the last row." },
+                            answer: ["usually sits", "is sitting"],
+                            multiPart: true,
+                            explanation: { en: "'Usually sits' for a habitual action. 'Is sitting' for an action happening today (now/temporarily).", ar: "'عادة ما تجلس' لفعل معتاد. 'تجلس' لفعل يحدث اليوم (الآن/مؤقتًا)." }
+                        },
+                        {
+                            id: 'vt_ex1_4', type: 'fillInTheBlank',
+                            instruction: { en: "Use either the simple present or the present progressive of the verbs in parentheses.", ar: "استخدم إما المضارع البسيط أو المضارع المستمر للأفعال بين القوسين." },
+                            question: { en: "4. Please sit quiet. I (try) _______ to concentrate.", ar: "4. من فضلك اجلس بهدوء. أنا (أحاول) _______ التركيز." },
+                            answer: "am trying",
+                            explanation: { en: "The action of trying to concentrate is happening now.", ar: "فعل محاولة التركيز يحدث الآن." }
+                        },
+                        {
+                            id: 'vt_ex1_5', type: 'fillInTheBlank',
+                            instruction: { en: "Use either the simple present or the present progressive of the verbs in parentheses.", ar: "استخدم إما المضارع البسيط أو المضارع المستمر للأفعال بين القوسين." },
+                            question: { en: "5. After three days of rain, I'm glad that the sun (shine) _______ again today.", ar: "5. بعد ثلاثة أيام من المطر، أنا سعيد لأن الشمس (تشرق) _______ مرة أخرى اليوم." },
+                            answer: "is shining",
+                            explanation: { en: "The sun is shining now (at the moment of speaking).", ar: "الشمس مشرقة الآن (في لحظة التحدث)." }
+                        },
+                        {
+                            id: 'vt_ex2_1', type: 'fillInTheBlank',
+                            instruction: { en: "Use any appropriate tense for the verbs in parentheses:", ar: "استخدم أي زمن مناسب للأفعال بين القوسين:" },
+                            question: { en: "1. My grandfather (fly, never) _______ in an airplane, and he has no intention of ever doing so.", ar: "1. جدي (لم يطير أبدًا) _______ في طائرة، وليس لديه أي نية للقيام بذلك." },
+                            answer: "has never flown",
+                            explanation: { en: "This describes an experience that has never happened up to the present moment, so Present Perfect is used.", ar: "يصف هذا تجربة لم تحدث أبدًا حتى اللحظة الحالية، لذا يستخدم المضارع التام." }
+                        },
+                        {
+                            id: 'vt_ex2_2', type: 'fillInTheBlank',
+                            instruction: { en: "Use any appropriate tense for the verbs in parentheses:", ar: "استخدم أي زمن مناسب للأفعال بين القوسين:" },
+                            question: { en: "2. Jane isn't here yet. I (wait) _______ for her since noon, but she still (arrive, not) _______. ", ar: "2. جين ليست هنا بعد. أنا (أنتظر) _______ لها منذ الظهر، لكنها لا تزال (لم تصل) _______." },
+                            answer: ["have been waiting", "hasn't arrived"],
+                            multiPart: true,
+                            explanation: { en: "'Have been waiting' indicates an action that started in the past (noon) and is still ongoing. 'Hasn't arrived' indicates an action that was expected but hasn't happened yet.", ar: "'أنتظر' يشير إلى فعل بدأ في الماضي (الظهر) وما زال مستمرًا. 'لم تصل' يشير إلى فعل كان متوقعًا ولكنه لم يحدث بعد." }
+                        },
+                        {
+                            id: 'vt_ex2_3', type: 'fillInTheBlank',
+                            instruction: { en: "Use any appropriate tense for the verbs in parentheses:", ar: "استخدم أي زمن مناسب للأفعال بين القوسين:" },
+                            question: { en: "3. In all the world, there (be) _______ only 14 mountains that (reach) _______ above 8.000 meters.", ar: "3. في جميع أنحاء العالم، هناك (يكون) _______ فقط 14 جبلًا (يصل) _______ فوق 8000 متر." },
+                            answer: ["are", "reach"],
+                            multiPart: true,
+                            explanation: { en: "This is a general truth/fact, so Simple Present is used for both verbs.", ar: "هذه حقيقة عامة، لذا يستخدم المضارع البسيط لكلا الفعلين." }
+                        },
+                        {
+                            id: 'vt_ex2_4', type: 'fillInTheBlank',
+                            instruction: { en: "Use any appropriate tense for the verbs in parentheses:", ar: "استخدم أي زمن مناسب للأفعال بين القوسين:" },
+                            question: { en: "4. I (have, already) _______ by the time you (get) _______ up.", ar: "4. أنا (أكون، بالفعل) _______ بحلول الوقت الذي (تستيقظ) _______ فيه." },
+                            answer: ["will have already left", "get"],
+                            multiPart: true,
+                            explanation: { en: "'Will have already left' indicates an action that will be completed before another future action. 'Get up' is in Simple Present for the time clause.", ar: "'سأكون قد غادرت بالفعل' يشير إلى فعل سيكتمل قبل فعل مستقبلي آخر. 'تستيقظ' في المضارع البسيط لعبارة الوقت." }
+                        },
+                        {
+                            id: 'vt_ex2_5', type: 'fillInTheBlank',
+                            instruction: { en: "Use any appropriate tense for the verbs in parentheses:", ar: "استخدم أي زمن مناسب للأفعال بين القوسين:" },
+                            question: { en: "5. About three yesterday afternoon, Jessica (lie) _______ in bed reading a book. Suddenly she (hear) _______ a loud noise and (get) _______ up to see what it was. She (look) _______ out the window. A truck (back, just) _______ into her new car.", ar: "5. حوالي الساعة الثالثة بعد ظهر أمس، كانت جيسيكا (تستلقي) _______ في السرير تقرأ كتابًا. فجأة (سمعت) _______ ضوضاء عالية و(نهضت) _______ لترى ما هي. (نظرت) _______ من النافذة. شاحنة (رجعت للتو) _______ إلى سيارتها الجديدة." },
+                            answer: ["was lying", "heard", "got", "looked", "had just backed"],
+                            multiPart: true,
+                            explanation: { en: "'Was lying' describes an ongoing action in the past interrupted by a sudden event. 'Heard,' 'got,' 'looked' are simple past for consecutive completed actions. 'Had just backed' indicates an action that happened immediately before another past action.", ar: "'كانت تستلقي' يصف فعلًا مستمرًا في الماضي تم قطعه بحدث مفاجئ. 'سمعت'، 'نهضت'، 'نظرت' هي أفعال ماضية بسيطة لأفعال متتالية مكتملة. 'كانت قد رجعت للتو' يشير إلى فعل حدث مباشرة قبل فعل ماضي آخر." }
+                        },
+                        {
+                            id: 'vt_ex2_6', type: 'fillInTheBlank',
+                            instruction: { en: "Use any appropriate tense for the verbs in parentheses:", ar: "استخدم أي زمن مناسب للأفعال بين القوسين:" },
+                            question: { en: "6. I (play) _______ tennis since two today.", ar: "6. أنا (ألعب) _______ التنس منذ الساعة الثانية اليوم." },
+                            answer: "have been playing",
+                            explanation: { en: "The action started at a specific point in the past ('since two today') and is still ongoing, so Present Perfect Continuous is used.", ar: "الفعل بدأ في نقطة زمنية محددة في الماضي ('منذ الساعة الثانية اليوم') وما زال مستمرًا، لذا يستخدم المضارع التام المستمر." }
+                        },
+                        {
+                            id: 'vt_ex2_7', type: 'fillInTheBlank',
+                            instruction: { en: "Use any appropriate tense for the verbs in parentheses:", ar: "استخدم أي زمن مناسب للأفعال بين القوسين:" },
+                            question: { en: "7. I (watch) _______ TV yesterday when it started to rain.", ar: "7. أنا (أشاهد) _______ التلفاز بالأمس عندما بدأ المطر." },
+                            answer: "was watching",
+                            explanation: { en: "'Was watching' describes an ongoing action in the past that was interrupted by another action ('started to rain').", ar: "'كنت أشاهد' يصف فعلًا مستمرًا في الماضي تم قطعه بفعل آخر ('بدأ المطر')." }
+                        },
+                        {
+                            id: 'vt_ex2_8', type: 'fillInTheBlank',
+                            instruction: { en: "Use any appropriate tense for the verbs in parentheses:", ar: "استخدم أي زمن مناسب للأفعال بين القوسين:" },
+                            question: { en: "8. I (be) _______ here since last September. Before that I (study) _______ English at another school.", ar: "8. أنا (أكون) _______ هنا منذ سبتمبر الماضي. قبل ذلك أنا (درست) _______ اللغة الإنجليزية في مدرسة أخرى." },
+                            answer: ["have been", "had studied"],
+                            multiPart: true,
+                            explanation: { en: "'Have been' indicates a state that started in the past and continues to the present. 'Had studied' indicates an action that was completed before another point in the past (before last September).", ar: "'كنت' يشير إلى حالة بدأت في الماضي وتستمر حتى الحاضر. 'كنت قد درست' يشير إلى فعل اكتمل قبل نقطة أخرى في الماضي (قبل سبتمبر الماضي)." }
+                        },
+                        {
+                            id: 'vt_quiz_1', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "1. There is nothing quite..............sleeping under the stars.", ar: "1. لا يوجد شيء يضاهي..............النوم تحت النجوم." },
+                            options: [
+                                { text: "the same as", value: "the same as" },
+                                { text: "as the same", value: "as the same" },
+                                { text: "different than the", value: "different than the" },
+                                { text: "as same a", value: "as same a" }
+                            ],
+                            answer: "the same as",
+                            explanation: { en: "'The same as' is the correct idiom for comparison of equality.", ar: "'The same as' هو التعبير الاصطلاحي الصحيح للمقارنة المتساوية." }
+                        },
+                        {
+                            id: 'vt_quiz_2', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "2. Wild animals are endangered not only by.........predators, pollution, and the many collectors of zoo specimens who encroach on their territory.", ar: "2. الحيوانات البرية مهددة بالانقراض ليس فقط بسبب.........المفترسات، التلوث، والعديد من جامعي عينات حدائق الحيوان الذين يتعدون على أراضيها." },
+                            options: [
+                                { text: "a hunting but also", value: "a hunting but also" },
+                                { text: "a hunting but also", value: "a hunting but also" },
+                                { text: "hunting but also", value: "hunting but also" },
+                                { text: "an hunt but also", value: "an hunt but also" }
+                            ],
+                            answer: "hunting but also",
+                            explanation: { en: "'Hunting' here is a gerund acting as a general activity, so no article is needed.", ar: "'Hunting' هنا هو اسم فعل يعمل كنشاط عام، لذا لا توجد حاجة لأداة تعريف." }
+                        },
+                        {
+                            id: 'vt_quiz_3', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "3. When the weather is pleasant in New York, it is.........on earth.", ar: "3. عندما يكون الطقس لطيفًا في نيويورك، فإنها.........على الأرض." },
+                            options: [
+                                { text: "finest place", value: "finest place" },
+                                { text: "the finest place", value: "the finest place" },
+                                { text: "the finest place", value: "the finest place" },
+                                { text: "finer place", value: "finer place" }
+                            ],
+                            answer: "the finest place",
+                            explanation: { en: "'Finest' is a superlative, which requires 'the'.", ar: "'Finest' هي صيغة تفضيل، تتطلب 'the'." }
+                        },
+                        {
+                            id: 'vt_quiz_4', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "4. Some of Charles Dickens's novels were originally published.........", ar: "4. بعض روايات تشارلز ديكنز نُشرت في الأصل........." },
+                            options: [
+                                { text: "in magazines", value: "in magazines" },
+                                { text: "on magazines", value: "on magazines" },
+                                { text: "at magazines", value: "at magazines" },
+                                { text: "as is magazines", value: "as is magazines" }
+                            ],
+                            answer: "in magazines",
+                            explanation: { en: "'In magazines' is the correct prepositional phrase for published works.", ar: "'In magazines' هي العبارة الحرفية الصحيحة للأعمال المنشورة." }
+                        },
+                        {
+                            id: 'vt_quiz_5', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "5. Low-fat yogurt contains..........in order to keep the number of calories from fat to a minimum.", ar: "5. الزبادي قليل الدسم يحتوي على..........للحفاظ على عدد السعرات الحرارية من الدهون إلى الحد الأدنى." },
+                            options: [
+                                { text: "the skimmed milk", value: "the skimmed milk" },
+                                { text: "a skimmed milk", value: "a skimmed milk" },
+                                { text: "skimmed milk", value: "skimmed milk" },
+                                { text: "skimming milk", value: "skimming milk" }
+                            ],
+                            answer: "skimmed milk",
+                            explanation: { en: "'Skimmed milk' is a noncount noun used in a general sense, so no article is needed.", ar: "'Skimmed milk' هو اسم غير معدود يستخدم بمعنى عام، لذا لا توجد حاجة لأداة تعريف." }
+                        }
+                    ]
+                },
+                passiveActive: {
+                    title: { en: "Passive and Active Voice", ar: "المبني للمعلوم والمبني للمجهول" },
+                    content: [
+                        { type: 'paragraph', en: "In an active sentence, the subject is the doer of the action, and the direct object is the receiver of the action. In a passive sentence the subject is the receiver of the action.", ar: "في الجملة المبنية للمعلوم، يكون الفاعل هو القائم بالفعل، والمفعول به المباشر هو متلقي الفعل. في الجملة المبنية للمجهول، يكون الفاعل هو متلقي الفعل." },
+                        { type: 'example', en: ["Active: John bought the book.", "Passive: The book was bought by John."], ar: ["المبني للمعلوم: John bought the book. (جون اشترى الكتاب.)", "المبني للمجهول: The book was bought by John. (الكتاب اشتُري بواسطة جون.)"] },
+                        { type: 'paragraph', en: "Important Note: A passive verb cannot have a direct object, with some exceptions like 'give', 'send', 'offer'. Only transitive verbs can be passive. Verbs like 'happen', 'occur', 'seem', 'appear' are never passive. 'Be born' is always passive.", ar: "ملاحظة هامة: لا يمكن للفعل المبني للمجهول أن يكون له مفعول به مباشر، مع بعض الاستثناءات مثل 'give'، 'send'، 'offer'. يمكن فقط تحويل الأفعال المتعدية إلى المبني للمجهول. الأفعال مثل 'happen'، 'occur'، 'seem'، 'appear' لا تكون أبدًا في صيغة المبني للمجهول. 'Be born' دائمًا في صيغة المبني للمجهول." },
+                        { type: 'subheading', en: "Passive Forms for English Verb Tenses", ar: "أشكال المبني للمجهول لأزمنة الأفعال الإنجليزية" },
+                        { type: 'table', en: [["Tense", "Form"], ["Past perfect", "had been loved"], ["Simple past", "was loved"], ["Past progressive", "was being loved"], ["Present perfect", "has been loved"], ["Simple present", "is loved"], ["Present progressive", "is being loved"], ["Future simple", "will be loved"], ["Future perfect", "will have been loved"]], ar: [["الزمن", "الشكل"], ["الماضي التام", "had been loved"], ["الماضي البسيط", "was loved"], ["الماضي المستمر", "was being loved"], ["المضارع التام", "has been loved"], ["المضارع البسيط", "is loved"], ["المضارع المستمر", "is being loved"], ["المستقبل البسيط", "will be loved"], ["المستقبل التام", "will have been loved"]] }
+                    ],
+                    exercises: [
+                        {
+                            id: 'pa_ex1_1', type: 'fillInTheBlank',
+                            instruction: { en: "Change the following sentence from active to passive voice:", ar: "غيّر الجملة التالية من صيغة المبني للمعلوم إلى صيغة المبني للمجهول:" },
+                            question: { en: "Somebody calls the president every day. -> The president _______ every day.", ar: "شخص ما يتصل بالرئيس كل يوم. -> الرئيس _______ كل يوم." },
+                            answer: "is called",
+                            explanation: { en: "Simple Present active becomes Simple Present Passive (is/are + past participle).", ar: "المضارع البسيط المبني للمعلوم يصبح مضارع بسيط مبني للمجهول (is/are + التصريف الثالث للفعل)." }
+                        },
+                        {
+                            id: 'pa_ex1_2', type: 'fillInTheBlank',
+                            instruction: { en: "Change the following sentence from active to passive voice:", ar: "غيّر الجملة التالية من صيغة المبني للمعلوم إلى صيغة المبني للمجهول:" },
+                            question: { en: "John is calling the other members. -> The other members _______ (by John).", ar: "جون يتصل بالأعضاء الآخرين. -> الأعضاء الآخرون _______ (بواسطة جون)." },
+                            answer: "are being called",
+                            explanation: { en: "Present Progressive active becomes Present Progressive Passive (is/am/are + being + past participle).", ar: "المضارع المستمر المبني للمعلوم يصبح مضارع مستمر مبني للمجهول (is/am/are + being + التصريف الثالث للفعل)." }
+                        },
+                        {
+                            id: 'pa_ex1_3', type: 'fillInTheBlank',
+                            instruction: { en: "Change the following sentence from active to passive voice:", ar: "غيّر الجملة التالية من صيغة المبني للمعلوم إلى صيغة المبني للمجهول:" },
+                            question: { en: "Martha was delivering the documents to the department. -> The documents _______ to the department (by Martha).", ar: "مارثا كانت تسلم الوثائق إلى القسم. -> الوثائق _______ إلى القسم (بواسطة مارثا)." },
+                            answer: "were being delivered",
+                            explanation: { en: "Past Progressive active becomes Past Progressive Passive (was/were + being + past participle).", ar: "الماضي المستمر المبني للمعلوم يصبح ماضي مستمر مبني للمجهول (was/were + being + التصريف الثالث للفعل)." }
+                        },
+                        {
+                            id: 'pa_ex1_4', type: 'fillInTheBlank',
+                            instruction: { en: "Change the following sentence from active to passive voice:", ar: "غيّر الجملة التالية من صيغة المبني للمعلوم إلى صيغة المبني للمجهول:" },
+                            question: { en: "The other members have repealed the amendment. -> The amendment _______ (by the other members).", ar: "الأعضاء الآخرون ألغوا التعديل. -> التعديل _______ (بواسطة الأعضاء الآخرين)." },
+                            answer: "has been repealed",
+                            explanation: { en: "Present Perfect active becomes Present Perfect Passive (has/have + been + past participle).", ar: "المضارع التام المبني للمعلوم يصبح مضارع تام مبني للمجهول (has/have + been + التصريف الثالث للفعل)." }
+                        },
+                        {
+                            id: 'pa_ex1_5', type: 'fillInTheBlank',
+                            instruction: { en: "Change the following sentence from active to passive voice:", ar: "غيّر الجملة التالية من صيغة المبني للمعلوم إلى صيغة المبني للمجهول:" },
+                            question: { en: "The delegates had received the information before the recess. -> The information _______ by the delegates before the recess.", ar: "المندوبون كانوا قد استلموا المعلومات قبل الاستراحة. -> المعلومات _______ بواسطة المندوبين قبل الاستراحة." },
+                            answer: "had been received",
+                            explanation: { en: "Past Perfect active becomes Past Perfect Passive (had + been + past participle).", ar: "الماضي التام المبني للمعلوم يصبح ماضي تام مبني للمجهول (had + been + التصريف الثالث للفعل)." }
+                        },
+                        {
+                            id: 'pa_ex1_6', type: 'fillInTheBlank',
+                            instruction: { en: "Change the following sentence from active to passive voice:", ar: "غيّر الجملة التالية من صيغة المبني للمعلوم إلى صيغة المبني للمجهول:" },
+                            question: { en: "The fire has caused considerable damage. -> Considerable damage _______ by the fire.", ar: "الحريق تسبب في أضرار جسيمة. -> أضرار جسيمة _______ بسبب الحريق." },
+                            answer: "has been caused",
+                            explanation: { en: "Present Perfect active becomes Present Perfect Passive.", ar: "المضارع التام المبني للمعلوم يصبح مضارع تام مبني للمجهول." }
+                        },
+                        {
+                            id: 'pa_ex1_7', type: 'fillInTheBlank',
+                            instruction: { en: "Change the following sentence from active to passive voice:", ar: "غيّر الجملة التالية من صيغة المبني للمعلوم إلى صيغة المبني للمجهول:" },
+                            question: { en: "John will have received the papers by tomorrow. -> The papers _______ by tomorrow (by John).", ar: "جون سيكون قد استلم الأوراق بحلول الغد. -> الأوراق _______ بحلول الغد (بواسطة جون)." },
+                            answer: "will have been received",
+                            explanation: { en: "Future Perfect active becomes Future Perfect Passive (will + have + been + past participle).", ar: "المستقبل التام المبني للمعلوم يصبح مستقبل تام مبني للمجهول (will + have + been + التصريف الثالث للفعل)." }
+                        },
+                        {
+                            id: 'pa_ex1_8', type: 'fillInTheBlank',
+                            instruction: { en: "Change the following sentence from active to passive voice:", ar: "غيّر الجملة التالية من صيغة المبني للمعلوم إلى صيغة المبني للمجهول:" },
+                            question: { en: "The company was developing a new procedure before the bankruptcy hearings began. -> A new procedure _______ by the company before the bankruptcy hearings began.", ar: "الشركة كانت تطور إجراءً جديدًا قبل بدء جلسات الإفلاس. -> إجراء جديد _______ بواسطة الشركة قبل بدء جلسات الإفلاس." },
+                            answer: "was being developed",
+                            explanation: { en: "Past Progressive active becomes Past Progressive Passive.", ar: "الماضي المستمر المبني للمعلوم يصبح ماضي مستمر مبني للمجهول." }
+                        },
+                        {
+                            id: 'pa_ex2_1', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "1. A strange thing happened yesterday.", ar: "1. حدث شيء غريب بالأمس." },
+                            options: [
+                                { text: "A strange thing was happened yesterday.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "cannot_change",
+                            explanation: { en: "'Happen' is an intransitive verb; it does not take a direct object.", ar: "'Happen' فعل لازم؛ لا يأخذ مفعول به مباشر." }
+                        },
+                        {
+                            id: 'pa_ex2_2', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "2. Jackie scored the winning goal.", ar: "2. جاكي سجل الهدف الفائز." },
+                            options: [
+                                { text: "The winning goal was scored by Jackie.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "passive",
+                            explanation: { en: "'Score' is a transitive verb.", ar: "'Score' فعل متعدي." }
+                        },
+                        {
+                            id: 'pa_ex2_3', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "3. My cat died.", ar: "3. ماتت قطتي." },
+                            options: [
+                                { text: "My cat was died.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "cannot_change",
+                            explanation: { en: "'Die' is an intransitive verb.", ar: "'Die' فعل لازم." }
+                        },
+                        {
+                            id: 'pa_ex2_4', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "4. I agree with Dr. Ikeda's theory.", ar: "4. أنا أتفق مع نظرية الدكتور إيكيدا." },
+                            options: [
+                                { text: "Dr. Ikeda's theory is agreed with by me.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "cannot_change",
+                            explanation: { en: "'Agree' is an intransitive verb in this context (it's followed by a prepositional phrase, not a direct object).", ar: "'Agree' فعل لازم في هذا السياق (يليه عبارة حرف جر، وليس مفعول به مباشر)." }
+                        },
+                        {
+                            id: 'pa_ex2_5', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "5. Timmy dropped the cup.", ar: "5. تيمي أسقط الكوب." },
+                            options: [
+                                { text: "The cup was dropped by Timmy.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "passive",
+                            explanation: { en: "'Drop' is a transitive verb.", ar: "'Drop' فعل متعدي." }
+                        },
+                        {
+                            id: 'pa_ex2_6', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "6. It rained hard yesterday.", ar: "6. أمطر بغزارة بالأمس." },
+                            options: [
+                                { text: "It was rained hard yesterday.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "cannot_change",
+                            explanation: { en: "'Rain' is an intransitive verb.", ar: "'Rain' فعل لازم." }
+                        },
+                        {
+                            id: 'pa_ex2_7', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "7. A hurricane destroyed the small fishing village.", ar: "7. إعصار دمر قرية الصيد الصغيرة." },
+                            options: [
+                                { text: "The small fishing village was destroyed by a hurricane.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "passive",
+                            explanation: { en: "'Destroy' is a transitive verb.", ar: "'Destroy' فعل متعدي." }
+                        },
+                        {
+                            id: 'pa_ex2_8', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "8. The children seemed happy when they went to the zoo.", ar: "8. بدا الأطفال سعداء عندما ذهبوا إلى حديقة الحيوان." },
+                            options: [
+                                { text: "The children were seemed happy when they went to the zoo.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "cannot_change",
+                            explanation: { en: "'Seem' is an intransitive verb.", ar: "'Seem' فعل لازم." }
+                        },
+                        {
+                            id: 'pa_ex2_9', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "9. The solution to my problem appeared to me in a dream.", ar: "9. ظهر لي حل مشكلتي في المنام." },
+                            options: [
+                                { text: "The solution to my problem was appeared to me in a dream.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "cannot_change",
+                            explanation: { en: "'Appear' is an intransitive verb.", ar: "'Appear' فعل لازم." }
+                        },
+                        {
+                            id: 'pa_ex2_10', type: 'multipleChoice',
+                            instruction: { en: "Change the active sentences to passive if possible. Some verbs are intransitive and cannot be changed.", ar: "غيّر الجمل المبنية للمعلوم إلى المبني للمجهول إذا أمكن. بعض الأفعال لازمة ولا يمكن تغييرها." },
+                            question: { en: "10. After class, one of the students always erases the chalkboard.", ar: "10. بعد الفصل، يقوم أحد الطلاب دائمًا بمسح السبورة." },
+                            options: [
+                                { text: "After class, the chalkboard is always erased by one of the students.", value: "passive" },
+                                { text: "Cannot be changed.", value: "cannot_change" }
+                            ],
+                            answer: "passive",
+                            explanation: { en: "'Erase' is a transitive verb.", ar: "'Erase' فعل متعدي." }
+                        },
+                        {
+                            id: 'pa_quiz_1', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "1. Spanish culture...the New World by sixteenth century conquistadors.", ar: "1. الثقافة الإسبانية...العالم الجديد بواسطة الفاتحين في القرن السادس عشر." },
+                            options: [
+                                { text: "was brought to", value: "was brought to" },
+                                { text: "be brought to", value: "be brought to" },
+                                { text: "brought to", value: "brought to" },
+                                { text: "brought", value: "brought" }
+                            ],
+                            answer: "was brought to",
+                            explanation: { en: "The culture is the receiver of the action (it was brought), so a passive form is needed. 'Was brought to' is the correct past passive form.", ar: "الثقافة هي متلقي الفعل (تم إحضارها)، لذا نحتاج إلى صيغة المبني للمجهول. 'was brought to' هي الصيغة الصحيحة للماضي المبني للمجهول." }
+                        },
+                        {
+                            id: 'pa_quiz_2', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "2. By the end of the year, the speed limit in many states...55 miles per hour.", ar: "2. بحلول نهاية العام، الحد الأقصى للسرعة في العديد من الولايات...55 ميلاً في الساعة." },
+                            options: [
+                                { text: "was reducing", value: "was reducing" },
+                                { text: "had reduced to", value: "had reduced to" },
+                                { text: "had been reduced to", value: "had been reduced to" },
+                                { text: "was being", value: "was being" }
+                            ],
+                            answer: "had been reduced to",
+                            explanation: { en: "The speed limit is the object of the action (it was reduced), so a passive form is needed. 'By the end of the year' indicates a completion before a past point, so Past Perfect Passive is best.", ar: "الحد الأقصى للسرعة هو مفعول به للفعل (تم تقليله)، لذا نحتاج إلى صيغة المبني للمجهول. 'بحلول نهاية العام' يشير إلى اكتمال قبل نقطة ماضية، لذا الماضي التام المبني للمجهول هو الأفضل." }
+                        },
+                        {
+                            id: 'pa_quiz_3', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "3. In the late 1980s, several of Van Gogh's paintings...off, each valued at more than ten million dollars.", ar: "3. في أواخر الثمانينيات، العديد من لوحات فان جوخ...، قيمة كل منها أكثر من عشرة ملايين دولار." },
+                            options: [
+                                { text: "were auctioned", value: "were auctioned" },
+                                { text: "will auction", value: "will auction" },
+                                { text: "auctioning", value: "auctioning" },
+                                { text: "auctioned", value: "auctioned" }
+                            ],
+                            answer: "were auctioned",
+                            explanation: { en: "The paintings are the receivers of the action (they were auctioned), so a passive form is needed. 'Were auctioned' is the correct past passive form.", ar: "اللوحات هي متلقي الفعل (تم بيعها بالمزاد)، لذا نحتاج إلى صيغة المبني للمجهول. 'were auctioned' هي الصيغة الصحيحة للماضي المبني للمجهول." }
+                        }
+                    ]
+                },
+                comparativeSuperlative: {
+                    title: { en: "Comparative and Superlative Adjectives", ar: "صفات المقارنة والتفضيل" },
+                    content: [
+                        { type: 'paragraph', en: "The comparative is used to compare two things. It is often followed by the word 'than'. The superlative is used to compare three or more things and is almost always preceded by 'the'.", ar: "تُستخدم المقارنة لمقارنة شيئين. غالبًا ما يتبعها كلمة 'than'. تُستخدم صيغة التفضيل لمقارنة ثلاثة أشياء أو أكثر وغالبًا ما تسبقها 'the'." },
+                        { type: 'subheading', en: "Comparative Rules", ar: "قواعد المقارنة" },
+                        { type: 'list', en: ["1. Add -er to the adjective base of most one and two-syllable adjectives (e.g., thick-thicker, quiet-quieter).", "2. Use the form 'more + adjective' for most three-syllable adjectives. (e.g., more beautiful, more important, more believable).", "3. Use the form 'more + adjective' for adjectives ending in the following suffixes: -ed, -ful, -ing, and -ous (e.g., more hated, more useful, more boring, more stylish, more cautious).", "4. Double the final consonant of one-syllable adjectives which end in a single consonant (except w, x, and z) and are preceded by a single vowel (e.g., big-bigger, red-redder, hot-hotter).", "5. When an adjective ends in a consonant + y, change the y to i and add -er (e.g., happy-happier, dry-drier)."], ar: ["1. أضف -er إلى أساس الصفة لمعظم الصفات ذات المقطع الواحد أو المقطعين (مثل thick-thicker, quiet-quieter).", "2. استخدم الصيغة 'more + الصفة' لمعظم الصفات ذات الثلاثة مقاطع. (مثل more beautiful, more important, more believable).", "3. استخدم الصيغة 'more + الصفة' للصفات التي تنتهي باللواحق التالية: -ed, -ful, -ing, و -ous (مثل more hated, more useful, more boring, more stylish, more cautious).", "4. ضاعف الحرف الساكن الأخير للصفات ذات المقطع الواحد التي تنتهي بحرف ساكن واحد (باستثناء w, x, و z) وتسبقها حرف علة واحد (مثل big-bigger, red-redder, hot-hotter).", "5. عندما تنتهي الصفة بحرف ساكن + y، غيّر y إلى i وأضف -er (مثل happy-happier, dry-drier)."] },
+                        { type: 'example', en: ["Allan writes faster than I write.", "He has seen that movie more often than they have seen it.", "John's grades are higher than his sister's.", "Today is hotter than yesterday.", "The chair is more comfortable than the other.", "He visits his family less frequently than she does.", "The year's exhibit is less impressive than last year's."], ar: ["آلان يكتب أسرع مما أكتب.", "لقد رأى ذلك الفيلم أكثر مما رأوه هم.", "درجات جون أعلى من أخته.", "اليوم أحر من الأمس.", "الكرسي أكثر راحة من الآخر.", "يزور عائلته أقل تكرارًا مما تفعل هي.", "معرض هذا العام أقل إثارة للإعجاب من معرض العام الماضي."] },
+                        { type: 'subheading', en: "Superlative Rules", ar: "قواعد التفضيل" },
+                        { type: 'list', en: ["When a comparison is made of three or more things, the adjective or adverb takes an -est ending or has the word 'most' preceding it.", "Generally, -est is used in the superlative wherever -er is used in the comparative (e.g., big-biggest, sunny-sunniest, fast-fastest, clever-cleverest).", "The word 'most' precedes the adjective wherever 'more' is used in the comparative (e.g., interesting-most interesting, quickly-most quickly, bored-most bored).", "Adjectives and adverbs that are irregular in the comparative are also irregular in the superlative (e.g., good-better-best, well-better-best, far-farther-farthest, bad-worse-worst)."], ar: ["عندما تتم مقارنة ثلاثة أشياء أو أكثر، تأخذ الصفة أو الظرف نهاية -est أو تسبقها كلمة 'most'.", "بشكل عام، تستخدم -est في صيغة التفضيل حيثما تستخدم -er في صيغة المقارنة (مثل big-biggest, sunny-sunniest, fast-fastest, clever-cleverest).", "تسبق كلمة 'most' الصفة حيثما تستخدم 'more' في المقارنة (مثل interesting-most interesting, quickly-most quickly, bored-most bored).", "الصفات والظروف التي تكون غير منتظمة في صيغة المقارنة تكون أيضًا غير منتظمة في صيغة التفضيل (مثل good-better-best, well-better-best, far-farther-farthest, bad-worse-worst)."] },
+                        { type: 'example', en: ["The Cadillac is the biggest car that we have.", "He was talking to the most gorgeous woman I have ever seen."], ar: ["كاديلاك هي أكبر سيارة لدينا.", "كان يتحدث إلى أجمل امرأة رأيتها على الإطلاق."] },
+                        { type: 'subheading', en: "Equal Comparisons", ar: "المقارنات المتساوية" },
+                        { type: 'text', en: "To say that things are equal in terms of a certain adjectival or adverbial quality, English uses this formula: As + adjective/adverb + as. Note that after the second 'as', a clause is used. If the verb and complement are the same after the word 'as', this clause can be reduced in two ways: 1. The verb can be reduced to an auxiliary. 2. The verb can be completely omitted so that only the subject is used. In this case, one should be sure to use the subject form of the pronoun.", ar: "للتعبير عن تساوي الأشياء من حيث صفة أو ظرف معين، تستخدم اللغة الإنجليزية هذه الصيغة: As + adjective/adverb + as. لاحظ أنه بعد 'as' الثانية، تستخدم عبارة. إذا كان الفعل والمكمل متطابقين بعد كلمة 'as'، يمكن اختصار هذه العبارة بطريقتين: 1. يمكن اختصار الفعل إلى فعل مساعد. 2. يمكن حذف الفعل بالكامل بحيث يستخدم الفاعل فقط. في هذه الحالة، يجب التأكد من استخدام صيغة الفاعل للضمير." },
+                        { type: 'example', en: ["Adjective: Marcia is as lucky as I am lucky.", "Adverb: Few authors today write as well as Graham Greene did.", "Marcia is as lucky as I am.", "Bill Rogers drives as fast as his wife does.", "My family has visited that area as often as yours has.", "Marcia is as lucky as I.", "Bill Rogers drives as fast as his wife.", "My family has visited that area as often as yours."], ar: ["صفة: Marcia is as lucky as I am lucky. (مارسيا محظوظة مثلي.)", "ظرف: Few authors today write as well as Graham Greene did. (قليل من المؤلفين اليوم يكتبون بنفس جودة غراهام غرين.)", "Marcia is as lucky as I am. (مارسيا محظوظة مثلي.)", "Bill Rogers drives as fast as his wife does. (بيل روجرز يقود بنفس سرعة زوجته.)", "My family has visited that area as often as yours has. (عائلتي زارت تلك المنطقة بنفس تكرار عائلتك.)", "Marcia is as lucky as I. (مارسيا محظوظة مثلي.)", "Bill Rogers drives as fast as his wife. (بيل روجرز يقود بنفس سرعة زوجته.)", "My family has visited that area as often as yours. (عائلتي زارت تلك المنطقة بنفس تكرار عائلتك.)"] }
+                    ],
+                    exercises: [
+                         {
+                            id: 'cs_ex1_1', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "1. Of the four dresses, I like the red one (better/best).", ar: "1. من بين الفساتين الأربعة، يعجبني الأحمر (better/best)." },
+                            options: [{text:"better", value:"better"}, {text:"best", value:"best"}],
+                            answer: "best",
+                            explanation: { en: "Comparing four dresses (more than two), so the superlative form is used.", ar: "مقارنة بين أربعة فساتين (أكثر من اثنين)، لذا يستخدم صيغة التفضيل." }
+                        },
+                        {
+                            id: 'cs_ex1_2', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "2. Phil is the (happier/happiest) person we know.", ar: "2. فيل هو الشخص (happier/happiest) الذي نعرفه." },
+                            options: [{text:"happier", value:"happier"}, {text:"happiest", value:"happiest"}],
+                            answer: "happiest",
+                            explanation: { en: "Comparing Phil to all people we know (more than two), so the superlative form is used.", ar: "مقارنة فيل بجميع الأشخاص الذين نعرفهم (أكثر من اثنين)، لذا يستخدم صيغة التفضيل." }
+                        },
+                        {
+                            id: 'cs_ex1_3', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "3. Pat's car is (faster/fastest) than Dan's.", ar: "3. سيارة بات (faster/fastest) من سيارة دان." },
+                            options: [{text:"faster", value:"faster"}, {text:"fastest", value:"fastest"}],
+                            answer: "faster",
+                            explanation: { en: "Comparing two cars, so the comparative form is used.", ar: "مقارنة بين سيارتين، لذا يستخدم صيغة المقارنة." }
+                        },
+                        {
+                            id: 'cs_ex1_4', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "4. This is the (creamier/creamiest) ice cream I have had in a long time.", ar: "4. هذا هو الآيس كريم (creamier/creamiest) الذي تناولته منذ فترة طويلة." },
+                            options: [{text:"creamier", value:"creamier"}, {text:"creamiest", value:"creamiest"}],
+                            answer: "creamiest",
+                            explanation: { en: "This ice cream is being compared to all other ice creams the speaker has had (more than two), so the superlative form is used.", ar: "يتم مقارنة هذا الآيس كريم بجميع أنواع الآيس كريم الأخرى التي تناولها المتحدث (أكثر من اثنين)، لذا يستخدم صيغة التفضيل." }
+                        },
+                        {
+                            id: 'cs_ex1_5', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "5. This poster is (colofuler/more colorful) than the one in the hall.", ar: "5. هذا الملصق (colofuler/more colorful) من الذي في القاعة." },
+                            options: [{text:"colofuler", value:"colofuler"}, {text:"more colorful", value:"more colorful"}],
+                            answer: "more colorful",
+                            explanation: { en: "'Colorful' is a three-syllable adjective, so 'more' is used for comparison between two posters.", ar: "'Colorful' صفة من ثلاثة مقاطع، لذا تستخدم 'more' للمقارنة بين ملصقين." }
+                        },
+                        {
+                            id: 'cs_ex1_6', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "6. Does Fred feel (weller/better) today than he did yesterday?", ar: "6. هل يشعر فريد (weller/better) اليوم مما كان عليه بالأمس؟" },
+                            options: [{text:"weller", value:"weller"}, {text:"better", value:"better"}],
+                            answer: "better",
+                            explanation: { en: "'Better' is the comparative form of 'well' (an adverb here, describing how he feels). Comparing two points in time (today vs. yesterday).", ar: "'Better' هي صيغة المقارنة من 'well' (ظرف هنا، يصف كيف يشعر). مقارنة بين نقطتين زمنيتين (اليوم مقابل الأمس)." }
+                        },
+                        {
+                            id: 'cs_ex1_7', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "7. This vegetable soup tastes (good/well).", ar: "7. طعم حساء الخضروات هذا (good/well)." },
+                            options: [{text:"good", value:"good"}, {text:"well", value:"well"}],
+                            answer: "good",
+                            explanation: { en: "'Good' is an adjective describing the taste of the soup. 'Well' is an adverb.", ar: "'Good' صفة تصف طعم الحساء. 'Well' ظرف." }
+                        },
+                        {
+                            id: 'cs_ex1_8', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "8. While trying to balance the baskets on her head, the woman walked (awkawrder/more awkwardly) than her daughter.", ar: "8. أثناء محاولتها موازنة السلال على رأسها، سارت المرأة (awkawrder/more awkwardly) من ابنتها." },
+                            options: [{text:"awkawrder", value:"awkawrder"}, {text:"more awkwardly", value:"more awkwardly"}],
+                            answer: "more awkwardly",
+                            explanation: { en: "'Awkwardly' is an adverb. For adverbs ending in -ly, 'more' is used for comparison.", ar: "'Awkwardly' ظرف. للظروف التي تنتهي بـ -ly، تستخدم 'more' للمقارنة." }
+                        },
+                        {
+                            id: 'cs_ex1_9', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "9. Jane is the (less/least) athletic of all the women.", ar: "9. جين هي الأقل (less/least) رياضيًا من بين جميع النساء." },
+                            options: [{text:"less", value:"less"}, {text:"least", value:"least"}],
+                            answer: "least",
+                            explanation: { en: "Comparing Jane to all women (more than two), so the superlative form 'least' is used.", ar: "مقارنة جين بجميع النساء (أكثر من اثنين)، لذا تستخدم صيغة التفضيل 'least'." }
+                        },
+                        {
+                            id: 'cs_ex1_10', type: 'multipleChoice',
+                            instruction: { en: "Select the correct form in parentheses in the following sentences.", ar: "اختر الشكل الصحيح بين قوسين في الجمل التالية." },
+                            question: { en: "10. George Washington is (famouser/more famous) than John Jay.", ar: "10. جورج واشنطن (famouser/more famous) من جون جاي." },
+                            options: [{text:"famouser", value:"famouser"}, {text:"more famous", value:"more famous"}],
+                            answer: "more famous",
+                            explanation: { en: "'Famous' is a two-syllable adjective that takes 'more' for comparison.", ar: "'Famous' صفة من مقطعين تأخذ 'more' للمقارنة." }
+                        },
+                        {
+                            id: 'cs_quiz_1', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "1. Tokyo being first, Geneva is said to have...cost of living in the world.", ar: "1. طوكيو هي الأولى، ويقال إن جنيف لديها...تكلفة المعيشة في العالم." },
+                            options: [
+                                { text: "the second of the", value: "a" },
+                                { text: "of the second highest", value: "b" },
+                                { text: "the second highest of the level", value: "c" },
+                                { text: "the second highest", value: "the second highest" }
+                            ],
+                            answer: "the second highest",
+                            explanation: { en: "This is a superlative comparison (in the world), and 'the second highest' is the correct structure.", ar: "هذه مقارنة تفضيلية (في العالم)، و 'the second highest' هو التركيب الصحيح." }
+                        },
+                        {
+                            id: 'cs_quiz_2', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "2. ...on an airplane's wings, the less the resistance on the craft and the greater its fuel efficiency.", ar: "2. ...على أجنحة الطائرة، كلما قلت المقاومة على الطائرة وزادت كفاءتها في استهلاك الوقود." },
+                            options: [
+                                { text: "The smaller the amount drag", value: "a" },
+                                { text: "The smaller drag", value: "b" },
+                                { text: "If the smaller the amount of drag", value: "c" },
+                                { text: "The smaller the amount of drag", value: "The smaller the amount of drag" }
+                            ],
+                            answer: "The smaller the amount of drag",
+                            explanation: { en: "This is a double comparative structure ('The + comparative, the + comparative'), indicating a direct relationship. 'The smaller the amount of drag' correctly sets up the first part.", ar: "هذا تركيب مقارنة مزدوجة ('The + مقارنة، the + مقارنة')، يشير إلى علاقة مباشرة. 'The smaller the amount of drag' يجهز الجزء الأول بشكل صحيح." }
+                        },
+                        {
+                            id: 'cs_quiz_3', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "3. Humans reach physical maturity more slowly than...", ar: "3. يصل البشر إلى النضج الجسدي ببطء أكثر من..." },
+                            options: [
+                                { text: "most other large mammals", value: "most other large mammals" },
+                                { text: "most other large mammals", value: "b" },
+                                { text: "does most other mammals", value: "c" },
+                                { text: "the most other large mammals", value: "d" }
+                            ],
+                            answer: "most other large mammals",
+                            explanation: { en: "When comparing 'humans' to a group, 'most other' is used to exclude humans from the group being compared.", ar: "عند مقارنة 'البشر' بمجموعة، تستخدم 'most other' لاستبعاد البشر من المجموعة التي تتم مقارنتها." }
+                        },
+                        {
+                            id: 'cs_quiz_4', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "4. Though they travel...Central America, the swallows always make a punctual return to the mission in Capistrano.", ar: "4. على الرغم من سفرهم...أمريكا الوسطى، فإن السنونو يعود دائمًا في موعده إلى بعثة كابسترانو." },
+                            options: [
+                                { text: "far away as", value: "a" },
+                                { text: "far as away", value: "b" },
+                                { text: "as far away as", value: "as far away as" },
+                                { text: "away as far", value: "d" }
+                            ],
+                            answer: "as far away as",
+                            explanation: { en: "'As far away as' is the correct idiom for expressing distance.", ar: "'As far away as' هو التعبير الاصطلاحي الصحيح للتعبير عن المسافة." }
+                        }
+                    ]
+                },
+                subjectVerbAgreement: {
+                    title: { en: "Subject-Verb Agreement", ar: "توافق الفاعل والفعل" },
+                    content: [
+                        { type: 'paragraph', en: "Singular/plural or number is an important aspect of the English language. The subject and the verb in a sentence must agree in person and number.", ar: "المفرد/الجمع أو العدد هو جانب مهم في اللغة الإنجليزية. يجب أن يتوافق الفاعل والفعل في الجملة من حيث الشخص والعدد." },
+                        { type: 'example', en: ["The elevator works very well. (singular verb)", "The elevators work very well. (plural verb)"], ar: ["المصعد يعمل بشكل جيد جدًا. (فعل مفرد)", "المصاعد تعمل بشكل جيد جدًا. (فعل جمع)"] },
+                        { type: 'subheading', en: "Confusing Areas in Subject-Verb Agreement", ar: "مناطق مربكة في توافق الفاعل والفعل" },
+                        { type: 'text', en: "1. When a subject is separated from the verb by a prepositional phrase: The verb agrees with the main subject, not the noun in the prepositional phrase.", ar: "1. عندما يفصل الفاعل عن الفعل بعبارة حرف جر: يتوافق الفعل مع الفاعل الرئيسي، وليس الاسم في عبارة حرف الجر." },
+                        { type: 'example', en: ["The problems with the students have not yet been resolved.", "The cat lying in the midst of hundreds of papers is content to doze in the afternoon sun."], ar: ["المشاكل مع الطلاب لم تحل بعد.", "القطة المستلقية وسط مئات الأوراق راضية بالنوم في شمس الظهيرة."] },
+                        { type: 'text', en: "2. The following expressions also have no effect on the verb: Together with, Accompanied with, Along with, As well as. (Note: If 'and' is used instead, the verb would be plural).", ar: "2. العبارات التالية ليس لها تأثير على الفعل: Together with, Accompanied with, Along with, As well as. (ملاحظة: إذا استخدم 'and' بدلاً من ذلك، فسيكون الفعل جمعًا)." },
+                        { type: 'example', en: ["The actress, along with her manager and some friends, is going to a party tonight.", "Mr. Robbins, accompanied by his wife and children, is arriving tonight.", "The actress and her manager are going to a party tonight."], ar: ["الممثلة، بالإضافة إلى مديرها وبعض الأصدقاء، ذاهبة إلى حفلة الليلة.", "السيد روبنز، برفقة زوجته وأطفاله، سيصل الليلة.", "الممثلة ومديرها ذاهبان إلى حفلة الليلة."] },
+                        { type: 'text', en: "3. Using All, Most, Some and Any + a plural Count Noun: When these words are followed by a plural count noun, the verb is plural.", ar: "3. استخدام All, Most, Some و Any + اسم معدود جمع: عندما تتبع هذه الكلمات باسم معدود جمع، يكون الفعل جمعًا." },
+                        { type: 'example', en: ["All men are created equal.", "Most of the notebooks were completed last week.", "Some of the students have finished."], ar: ["جميع الرجال متساوون.", "معظم الدفاتر اكتملت الأسبوع الماضي.", "بعض الطلاب انتهوا."] },
+                        { type: 'text', en: "4. Using All, Most, Some and Any + a noncount noun: When these words are followed by a non-count noun, the verb is singular.", ar: "4. استخدام All, Most, Some و Any + اسم غير معدود: عندما تتبع هذه الكلمات باسم غير معدود، يكون الفعل مفردًا." },
+                        { type: 'example', en: ["All of the cake has been eaten.", "Some fat is good for you.", "Most car exhaust contains pollutants that threaten all living things."], ar: ["كل الكعكة قد أكلت.", "بعض الدهون مفيدة لك.", "معظم عوادم السيارات تحتوي على ملوثات تهدد جميع الكائنات الحية."] },
+                        { type: 'text', en: "5. Using none and neither: None and neither always take a singular verb, whether followed by a plural or a noncount noun.", ar: "5. استخدام none و neither: تأخذ none و neither دائمًا فعلًا مفردًا، سواء تبعها اسم جمع أو اسم غير معدود." },
+                        { type: 'example', en: ["None of the dogs belongs to me.", "Neither of the women is the one who spoke to me yesterday.", "None of the tea in this store is fresh."], ar: ["لا أحد من الكلاب يخصني.", "لا أحد من النساء هي التي تحدثت إلي بالأمس.", "لا شيء من الشاي في هذا المتجر طازج."] },
+                        { type: 'text', en: "6. Using either... or and neither....nor: With these expressions, the noun closest to the verb determines whether the verb is singular or plural. (Note: Both...and is always plural).", ar: "6. استخدام either...or و neither....nor: مع هذه العبارات، يحدد الاسم الأقرب للفعل ما إذا كان الفعل مفردًا أو جمعًا. (ملاحظة: Both...and دائمًا جمع)." },
+                        { type: 'example', en: ["Neither the children nor their mother wants to leave.", "Either you or I am going to call an end to this charade.", "Both my brother and I are interested in joining the team."], ar: ["لا الأطفال ولا والدتهم يريدون المغادرة.", "إما أنت أو أنا سأنهي هذه المهزلة.", "أخي وأنا كلاهما مهتمان بالانضمام إلى الفريق."] },
+                        { type: 'text', en: "7. Using Every: Although it does not seem logical, nouns following every are singular, and they take singular verbs. This includes the nouns everyone, everybody, and everything.", ar: "7. استخدام Every: على الرغم من أنه لا يبدو منطقيًا، فإن الأسماء التي تتبع every تكون مفردة، وتأخذ أفعالًا مفردة. وهذا يشمل الأسماء everyone, everybody, و everything." },
+                        { type: 'example', en: ["Everybody is going to be there!", "Every man, woman, and child has been rescued.", "Every watch in the store is on sale."], ar: ["الجميع سيكونون هناك!", "تم إنقاذ كل رجل وامرأة وطفل.", "كل ساعة في المتجر معروضة للبيع."] },
+                        { type: 'text', en: "8. Using Singular Nouns that end in -s: There are a few nouns that end in -s that take a singular verb. These nouns often refer to countries, fields of study, activities and diseases.", ar: "8. استخدام الأسماء المفردة التي تنتهي بـ -s: هناك بعض الأسماء التي تنتهي بـ -s وتأخذ فعلًا مفردًا. غالبًا ما تشير هذه الأسماء إلى البلدان، مجالات الدراسة، الأنشطة والأمراض." },
+                        { type: 'example', en: ["Countries: The United States doesn't have a centralized governing body for educational affairs.", "Fields of study: Mathematics was not my favorite subject in school.", "Activities: The politics of even a small town is often very complicated.", "Diseases: Measles is a serious childhood disease if not treated properly."], ar: ["البلدان: الولايات المتحدة ليس لديها هيئة حاكمة مركزية للشؤون التعليمية.", "مجالات الدراسة: الرياضيات لم تكن مادتي المفضلة في المدرسة.", "الأنشطة: سياسة حتى بلدة صغيرة غالبًا ما تكون معقدة جدًا.", "الأمراض: الحصبة مرض خطير في الطفولة إذا لم تعالج بشكل صحيح."] },
+                        { type: 'text', en: "9. Using Collective Nouns: Most collective nouns take the singular form of the verb because the group is seen as a united whole. (Note: Majority can be singular or plural. If it is alone, it is usually singular; if it is followed by a plural noun, it is usually plural).", ar: "9. استخدام الأسماء الجماعية: تأخذ معظم الأسماء الجماعية صيغة الفعل المفرد لأن المجموعة تعتبر وحدة واحدة. (ملاحظة: Majority يمكن أن تكون مفردًا أو جمعًا. إذا كانت وحدها، فهي عادة مفردة؛ إذا تبعها اسم جمع، فهي عادة جمع)." },
+                        { type: 'example', en: ["The committee doesn't have to come up with a solution until next week.", "The crowd has been standing in front of the building for almost two hours already.", "The majority believes that we are in danger.", "The majority of the students believe him to be innocent."], ar: ["اللجنة لا يجب أن تتوصل إلى حل حتى الأسبوع المقبل.", "الحشد يقف أمام المبنى منذ ما يقرب من ساعتين بالفعل.", "الأغلبية تعتقد أننا في خطر.", "أغلبية الطلاب يعتقدون أنه بريء."] },
+                        { type: 'text', en: "10. Remember that the nouns people, and police are considered plural, so they take plural verbs.", ar: "10. تذكر أن الأسماء people و police تعتبر جمعًا، لذا تأخذ أفعالًا جمعًا." },
+                        { type: 'example', en: ["The people were happy to see the return of their king.", "The police are here to serve and protect."], ar: ["كان الناس سعداء لرؤية عودة ملكهم.", "الشرطة هنا لخدمة وحماية."] },
+                        { type: 'text', en: "11. Using expressions of Time, Distance, and Money in the plural Form: These expressions take a singular verb.", ar: "11. استخدام تعبيرات الوقت والمسافة والمال بصيغة الجمع: تأخذ هذه التعبيرات فعلًا مفردًا." },
+                        { type: 'example', en: ["Two miles is too far to walk in this blistering sun.", "Sixty dollars is a fair price for such an old painting.", "Five hours has already passed since his surgery ended."], ar: ["ميلان مسافة بعيدة جدًا للمشي في هذه الشمس الحارقة.", "ستون دولارًا سعر عادل لمثل هذه اللوحة القديمة.", "لقد مرت خمس ساعات بالفعل منذ انتهاء عمليته الجراحية."] },
+                        { type: 'text', en: "12. Using The + an adjective as a subject: The + an adjective takes a plural verb because it refers to a whole group of people.", ar: "12. استخدام The + صفة كفاعل: تأخذ The + صفة فعلًا جمعًا لأنها تشير إلى مجموعة كاملة من الناس." },
+                        { type: 'example', en: ["The rich are not well respected by the blue-collar constituency of this area.", "Certainly, the educated are at an advantage when looking for a job.", "The sick were taken to the hospital immediately."], ar: ["الأغنياء لا يحظون باحترام كبير من قبل الطبقة العاملة في هذه المنطقة.", "بالتأكيد، المتعلمون يتمتعون بميزة عند البحث عن وظيفة.", "تم نقل المرضى إلى المستشفى على الفور."] },
+                        { type: 'text', en: "13. Using Adjective Clauses: The verb inside a relative clause agrees with the subject of the clause. If the subject is a relative pronoun (who, which or that), the verb agrees with the antecedent of the pronoun.", ar: "13. استخدام العبارات الوصفية: يتوافق الفعل داخل العبارة النسبية مع فاعل العبارة. إذا كان الفاعل ضميرًا نسبيًا (who, which أو that)، يتوافق الفعل مع الاسم الذي يشير إليه الضمير." },
+                        { type: 'example', en: ["The woman who lives there is my mother.", "The women who live there are my aunts."], ar: ["المرأة التي تعيش هناك هي أمي.", "النساء اللواتي يعشن هناك هن عماتي."] },
+                        { type: 'text', en: "14. A number of/the number of: 'A number of + plural noun + plural verb'. 'The number of + plural noun + singular verb'.", ar: "14. A number of/the number of: 'A number of + اسم جمع + فعل جمع'. 'The number of + اسم جمع + فعل مفرد'." },
+                        { type: 'example', en: ["A number of students are going to the class picnic.", "The number of days in a week is seven.", "A number of the applicants have already been interviewed."], ar: ["عدد من الطلاب ذاهبون إلى نزهة الفصل.", "عدد الأيام في الأسبوع هو سبعة.", "عدد من المتقدمين تمت مقابلتهم بالفعل."] },
+                        { type: 'text', en: "15. Gerunds as subjects: If a sentence begins with verb + ing (gerund), the verb must also be singular.", ar: "15. المصادر كفاعل: إذا بدأت الجملة بفعل + ing (اسم فعل)، يجب أن يكون الفعل مفردًا أيضًا." },
+                        { type: 'example', en: ["Knowing her has made him what he is.", "Dieting is very popular today.", "Not studying has caused him many problems."], ar: ["معرفتها جعلته ما هو عليه.", "اتباع الحمية الغذائية شائع جدًا اليوم.", "عدم الدراسة سبب له العديد من المشاكل."] },
+                        { type: 'text', en: "16. There is/There are: With sentences beginning with the existential 'there', the subject is actually after the verb.", ar: "16. There is/There are: في الجمل التي تبدأ بـ 'there' الوجودية، يكون الفاعل فعليًا بعد الفعل." },
+                        { type: 'example', en: ["There is a storm approaching.", "There have been a number of telephone calls today.", "There was an accident last night."], ar: ["عاصفة تقترب.", "كان هناك عدد من المكالمات الهاتفية اليوم.", "حدث حادث الليلة الماضية."] },
+                    ],
+                    exercises: [
+                        {
+                            id: 'sva_ex1_1', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "1. John, along with twenty friends, (is/are) planning a party.", ar: "1. جون، بالإضافة إلى عشرين صديقًا، (is/are) يخطط لحفلة." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "is",
+                            explanation: { en: "The subject is 'John' (singular). 'along with twenty friends' is a modifying phrase and does not affect the verb agreement.", ar: "الفاعل هو 'John' (مفرد). 'along with twenty friends' هي عبارة وصفية ولا تؤثر على توافق الفعل." }
+                        },
+                        {
+                            id: 'sva_ex1_2', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "2. The pictures of the soldiers (bring/brings) back many memories.", ar: "2. صور الجنود (bring/brings) تعيد ذكريات كثيرة." },
+                            options: [{ text: "bring", value: "bring" }, { text: "brings", value: "brings" }],
+                            answer: "bring",
+                            explanation: { en: "The subject is 'pictures' (plural). 'of the soldiers' is a prepositional phrase.", ar: "الفاعل هو 'pictures' (جمع). 'of the soldiers' هي عبارة حرف جر." }
+                        },
+                        {
+                            id: 'sva_ex1_3', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "3. The quality of these recordings (are, is) not very good.", ar: "3. جودة هذه التسجيلات (are, is) ليست جيدة جدًا." },
+                            options: [{ text: "are", value: "are" }, { text: "is", value: "is" }],
+                            answer: "is",
+                            explanation: { en: "The subject is 'quality' (singular). 'of these recordings' is a prepositional phrase.", ar: "الفاعل هو 'quality' (مفرد). 'of these recordings' هي عبارة حرف جر." }
+                        },
+                        {
+                            id: 'sva_ex1_4', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "4. If the duties of these officers (isn't/aren't) reduced, there will not be enough time to finish the project.", ar: "4. إذا لم يتم تقليل واجبات هؤلاء الضباط (isn't/aren't)، فلن يكون هناك وقت كافٍ لإنهاء المشروع." },
+                            options: [{ text: "isn't", value: "isn't" }, { text: "aren't", value: "aren't" }],
+                            answer: "aren't",
+                            explanation: { en: "The subject is 'duties' (plural). 'of these officers' is a prepositional phrase.", ar: "الفاعل هو 'duties' (جمع). 'of these officers' هي عبارة حرف جر." }
+                        },
+                        {
+                            id: 'sva_ex1_5', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "5. The effects of cigarette smoking (have/has) been proven to be extremely harmful.", ar: "5. آثار تدخين السجائر (have/has) ثبت أنها ضارة للغاية." },
+                            options: [{ text: "have", value: "have" }, { text: "has", value: "has" }],
+                            answer: "have",
+                            explanation: { en: "The subject is 'effects' (plural). 'of cigarette smoking' is a prepositional phrase.", ar: "الفاعل هو 'effects' (جمع). 'of cigarette smoking' هي عبارة حرف جر." }
+                        },
+                        {
+                            id: 'sva_ex1_6', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "6. The use of credit cards in place of cash (have/has) increased rapidly in recent years.", ar: "6. استخدام بطاقات الائتمان بدلاً من النقد (have/has) زاد بسرعة في السنوات الأخيرة." },
+                            options: [{ text: "have", value: "have" }, { text: "has", value: "has" }],
+                            answer: "has",
+                            explanation: { en: "The subject is 'use' (singular). 'of credit cards in place of cash' is a prepositional phrase.", ar: "الفاعل هو 'use' (مفرد). 'of credit cards in place of cash' هي عبارة حرف جر." }
+                        },
+                        {
+                            id: 'sva_ex1_7', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "7. Advertisements on television (is/are) becoming more competitive than ever before.", ar: "7. الإعلانات التلفزيونية (is/are) أصبحت أكثر تنافسية من أي وقت مضى." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "are",
+                            explanation: { en: "The subject is 'Advertisements' (plural). 'on television' is a prepositional phrase.", ar: "الفاعل هو 'Advertisements' (جمع). 'on television' هي عبارة حرف جر." }
+                        },
+                        {
+                            id: 'sva_ex1_8', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "8. Living expenses in this country, as well as in many others, (is/are) at an all-time high.", ar: "8. نفقات المعيشة في هذا البلد، وكذلك في العديد من البلدان الأخرى، (is/are) في أعلى مستوياتها على الإطلاق." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "are",
+                            explanation: { en: "The subject is 'expenses' (plural). 'as well as in many others' is a modifying phrase.", ar: "الفاعل هو 'expenses' (جمع). 'as well as in many others' هي عبارة وصفية." }
+                        },
+                        {
+                            id: 'sva_ex1_9', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "9. Mr. Jones, accompanied by several members of the committee, (have/has) proposed some changes of the rules.", ar: "9. السيد جونز، برفقة عدة أعضاء من اللجنة، (have/has) اقترح بعض التغييرات على القواعد." },
+                            options: [{ text: "have", value: "have" }, { text: "has", value: "has" }],
+                            answer: "has",
+                            explanation: { en: "The subject is 'Mr. Jones' (singular). 'accompanied by several members of the committee' is a modifying phrase.", ar: "الفاعل هو 'Mr. Jones' (مفرد). 'accompanied by several members of the committee' هي عبارة وصفية." }
+                        },
+                        {
+                            id: 'sva_ex1_10', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in parentheses:", ar: "اختر الشكل الصحيح للفعل بين قوسين:" },
+                            question: { en: "10. The levels of intoxication (vary/varies) from subject to subject.", ar: "10. مستويات التسمم (vary/varies) تختلف من شخص لآخر." },
+                            options: [{ text: "vary", value: "vary" }, { text: "varies", value: "varies" }],
+                            answer: "vary",
+                            explanation: { en: "The subject is 'levels' (plural). 'of intoxication' is a prepositional phrase.", ar: "الفاعل هو 'levels' (جمع). 'of intoxication' هي عبارة حرف جر." }
+                        },
+                        {
+                            id: 'sva_ex2_1', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "1. Neither Bill nor Mary (is/are) going to the play tonight.", ar: "1. لا بيل ولا ماري (is/are) ذاهبان إلى المسرحية الليلة." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "is",
+                            explanation: { en: "With 'neither...nor', the verb agrees with the noun closest to it ('Mary' is singular).", ar: "مع 'neither...nor'، يتوافق الفعل مع الاسم الأقرب إليه ('Mary' مفرد)." }
+                        },
+                        {
+                            id: 'sva_ex2_2', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "2. Anything (is/are) better than going to another movie tonight.", ar: "2. أي شيء (is/are) أفضل من الذهاب إلى فيلم آخر الليلة." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "is",
+                            explanation: { en: "'Anything' is a singular pronoun.", ar: "'Anything' ضمير مفرد." }
+                        },
+                        {
+                            id: 'sva_ex2_3', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "3. Skating (is/are) becoming more popular every day.", ar: "3. التزلج (is/are) يصبح أكثر شعبية كل يوم." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "is",
+                            explanation: { en: "'Skating' is a gerund acting as a singular subject.", ar: "'Skating' هو اسم فعل يعمل كفاعل مفرد." }
+                        },
+                        {
+                            id: 'sva_ex2_4', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "4. A number of reporters (was/were) at the conference yesterday.", ar: "4. عدد من المراسلين (was/were) في المؤتمر بالأمس." },
+                            options: [{ text: "was", value: "was" }, { text: "were", value: "were" }],
+                            answer: "were",
+                            explanation: { en: "'A number of' followed by a plural noun takes a plural verb.", ar: "'A number of' متبوعة باسم جمع تأخذ فعل جمع." }
+                        },
+                        {
+                            id: 'sva_ex2_5', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "5. Everybody who (has/have) a fever must go home immediately.", ar: "5. كل شخص (has/have) حمى يجب أن يذهب إلى المنزل فورًا." },
+                            options: [{ text: "has", value: "has" }, { text: "have", value: "have" }],
+                            answer: "has",
+                            explanation: { en: "'Everybody' is a singular pronoun. The verb in the relative clause ('who has') agrees with 'Everybody'.", ar: "'Everybody' ضمير مفرد. الفعل في العبارة الوصفية ('who has') يتوافق مع 'Everybody'." }
+                        },
+                        {
+                            id: 'sva_ex2_6', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "6. There (was/were) some people at the meeting last night.", ar: "6. كان هناك (was/were) بعض الأشخاص في الاجتماع الليلة الماضية." },
+                            options: [{ text: "was", value: "was" }, { text: "were", value: "were" }],
+                            answer: "were",
+                            explanation: { en: "With 'There was/were', the verb agrees with the noun that follows it ('some people' is plural).", ar: "مع 'There was/were'، يتوافق الفعل مع الاسم الذي يليه ('some people' جمع)." }
+                        },
+                        {
+                            id: 'sva_ex2_7', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "7. The number of students who have withdrawn from class this quarter (is/are) appalling.", ar: "7. عدد الطلاب الذين انسحبوا من الفصل هذا الربع (is/are) مروع." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "is",
+                            explanation: { en: "'The number of' followed by a plural noun takes a singular verb.", ar: "'The number of' متبوعة باسم جمع تأخذ فعل مفرد." }
+                        },
+                        {
+                            id: 'sva_ex2_8', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "8. Every elementary school teacher (has/have) to take this examination.", ar: "8. كل معلم مدرسة ابتدائية (has/have) أن يخضع لهذا الامتحان." },
+                            options: [{ text: "has", value: "has" }, { text: "have", value: "have" }],
+                            answer: "has",
+                            explanation: { en: "'Every' always takes a singular verb.", ar: "'Every' تأخذ دائمًا فعل مفرد." }
+                        },
+                        {
+                            id: 'sva_ex2_9', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "9. Neither Jill nor her parents (has/have) seen this movie before.", ar: "9. لا جيل ولا والداها (has/have) شاهدا هذا الفيلم من قبل." },
+                            options: [{ text: "has", value: "has" }, { text: "have", value: "have" }],
+                            answer: "have",
+                            explanation: { en: "With 'neither...nor', the verb agrees with the noun closest to it ('her parents' is plural).", ar: "مع 'neither...nor'، يتوافق الفعل مع الاسم الأقرب إليه ('her parents' جمع)." }
+                        },
+                        {
+                            id: 'sva_ex2_10', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct form of the verb in the following sentences:", ar: "اختر الشكل الصحيح للفعل في الجمل التالية:" },
+                            question: { en: "10. The committee (has/have) already reached a decision.", ar: "10. اللجنة (has/have) وصلت بالفعل إلى قرار." },
+                            options: [{ text: "has", value: "has" }, { text: "have", value: "have" }],
+                            answer: "has",
+                            explanation: { en: "'Committee' is a collective noun, usually treated as singular when acting as a united whole.", ar: "'Committee' اسم جمعي، ويعامل عادة على أنه مفرد عندما يعمل كوحدة موحدة." }
+                        },
+                        {
+                            id: 'sva_ex3_1', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "1. No one in this group of contenders...........a chance of beating the current speed record.(has, have).", ar: "1. لا أحد في هذه المجموعة من المتنافسين...........فرصة لكسر الرقم القياسي الحالي للسرعة. (has, have)." },
+                            options: [{ text: "has", value: "has" }, { text: "have", value: "have" }],
+                            answer: "has",
+                            explanation: { en: "'No one' is a singular pronoun.", ar: "'No one' ضمير مفرد." }
+                        },
+                        {
+                            id: 'sva_ex3_2', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "2. Neither the education library nor the psychology library..............the books that the professor recommended. (has, have).", ar: "2. لا مكتبة التعليم ولا مكتبة علم النفس..............الكتب التي أوصى بها الأستاذ. (has, have)." },
+                            options: [{ text: "has", value: "has" }, { text: "have", value: "have" }],
+                            answer: "has",
+                            explanation: { en: "With 'neither...nor', the verb agrees with the noun closest to it ('library' is singular).", ar: "مع 'neither...nor'، يتوافق الفعل مع الاسم الأقرب إليه ('library' مفرد)." }
+                        },
+                        {
+                            id: 'sva_ex3_3', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "3. Restricted ownership and enforced registration.................two major approaches to handgun legislation. (is, are).", ar: "3. الملكية المقيدة والتسجيل الإجباري.................نهجان رئيسيان لتشريع الأسلحة النارية. (is, are)." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "are",
+                            explanation: { en: "The compound subject 'ownership and registration' is plural.", ar: "الفاعل المركب 'ownership and registration' جمع." }
+                        },
+                        {
+                            id: 'sva_ex3_4', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "4. There. ......no doubt in anyone's mind about the guilt of the defendants. (was, were).", ar: "4. لم يكن هناك. ......شك في ذهن أحد بشأن ذنب المتهمين. (was, were)." },
+                            options: [{ text: "was", value: "was" }, { text: "were", value: "were" }],
+                            answer: "was",
+                            explanation: { en: "With 'There was/were', the verb agrees with the noun that follows it ('no doubt' is singular).", ar: "مع 'There was/were'، يتوافق الفعل مع الاسم الذي يليه ('no doubt' مفرد)." }
+                        },
+                        {
+                            id: 'sva_ex3_5', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "5. A gray and white car...parked outside the building. (is, are).", ar: "5. سيارة رمادية وبيضاء...مركونة خارج المبنى. (is, are)." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "is",
+                            explanation: { en: "The subject 'car' is singular.", ar: "الفاعل 'car' مفرد." }
+                        },
+                        {
+                            id: 'sva_ex3_6', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "6. Every success and failure...........to an individual's growth and maturity. (contributes, contribute)", ar: "6. كل نجاح وفشل...........لنمو الفرد ونضجه. (contributes, contribute)" },
+                            options: [{ text: "contributes", value: "contributes" }, { text: "contribute", value: "contribute" }],
+                            answer: "contributes",
+                            explanation: { en: "'Every' always takes a singular verb, even with a compound subject.", ar: "'Every' تأخذ دائمًا فعل مفرد، حتى مع الفاعل المركب." }
+                        },
+                        {
+                            id: 'sva_ex3_7', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "7. The news on the local radio stations as well as newspaper accounts...that the prison riot was serious. (confirms, confirm)", ar: "7. الأخبار في محطات الراديو المحلية وكذلك التقارير الصحفية...أن أعمال الشغب في السجن كانت خطيرة. (confirms, confirm)" },
+                            options: [{ text: "confirms", value: "confirms" }, { text: "confirm", value: "confirm" }],
+                            answer: "confirms",
+                            explanation: { en: "The main subject is 'The news' which is singular. The phrase 'as well as newspaper accounts' does not affect the singularity of the subject.", ar: "الفاعل الرئيسي هو 'The news' وهو مفرد. عبارة 'as well as newspaper accounts' لا تؤثر على مفردية الفاعل." }
+                        },
+                        {
+                            id: 'sva_ex3_8', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "8. It is still the women who.........the burden of household chores. (bears, bear).", ar: "8. لا تزال النساء هن اللواتي.........عبء الأعمال المنزلية. (bears, bear)." },
+                            options: [{ text: "bears", value: "bears" }, { text: "bear", value: "bear" }],
+                            answer: "bear",
+                            explanation: { en: "The verb in the relative clause ('who bear') agrees with its antecedent 'women' (plural).", ar: "الفعل في العبارة الوصفية ('who bear') يتوافق مع الاسم الذي يشير إليه 'women' (جمع)." }
+                        },
+                        {
+                            id: 'sva_ex3_9', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "9. Neither all of the cookies nor all of the fruit...............been eaten yet. (has, have).", ar: "9. لا كل الكعك ولا كل الفاكهة...............أكلت بعد. (has, have)." },
+                            options: [{ text: "has", value: "has" }, { text: "have", value: "have" }],
+                            answer: "has",
+                            explanation: { en: "With 'neither...nor', the verb agrees with the noun closest to it ('fruit' is noncount and singular).", ar: "مع 'neither...nor'، يتوافق الفعل مع الاسم الأقرب إليه ('fruit' غير معدود ومفرد)." }
+                        },
+                        {
+                            id: 'sva_ex3_10', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "10. Unlike Americans who seem to prefer coffee, the English.. .......a great deal of tea. (drinks, drink).", ar: "10. على عكس الأمريكيين الذين يبدو أنهم يفضلون القهوة، الإنجليز.. .......كمية كبيرة من الشاي. (drinks, drink)." },
+                            options: [{ text: "drinks", value: "drinks" }, { text: "drink", value: "drink" }],
+                            answer: "drink",
+                            explanation: { en: "'The English' refers to the people of England (plural).", ar: "'The English' تشير إلى شعب إنجلترا (جمع)." }
+                        },
+                        {
+                            id: 'sva_ex3_11', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "11. The number of days of vacation provided to university employees.........constant from year to year. (remain, remains).", ar: "11. عدد أيام الإجازة المقدمة لموظفي الجامعة.........ثابت من سنة إلى أخرى. (remain, remains)." },
+                            options: [{ text: "remain", value: "remain" }, { text: "remains", value: "remains" }],
+                            answer: "remains",
+                            explanation: { en: "'The number of' followed by a plural noun takes a singular verb.", ar: "'The number of' متبوعة باسم جمع تأخذ فعل مفرد." }
+                        },
+                        {
+                            id: 'sva_ex3_12', type: 'multipleChoice',
+                            instruction: { en: "Underline the subject with which the missing verb must agree. Then, fill in the blank with the correct verb form from the two choices in parentheses.", ar: "ضع خطًا تحت الفاعل الذي يجب أن يتوافق معه الفعل الناقص. ثم املأ الفراغ بالشكل الصحيح للفعل من الخيارين بين قوسين." },
+                            question: { en: "12. Despite the development of a vaccine, measles...............still a serious danger to adult victims.(is, are).", ar: "12. على الرغم من تطوير لقاح، الحصبة...............لا تزال خطرًا جادًا على الضحايا البالغين. (is, are)." },
+                            options: [{ text: "is", value: "is" }, { text: "are", value: "are" }],
+                            answer: "is",
+                            explanation: { en: "'Measles' is a disease name ending in -s but takes a singular verb.", ar: "'Measles' اسم مرض ينتهي بـ -s ولكنه يأخذ فعل مفرد." }
+                        },
+                        {
+                            id: 'sva_quiz_1', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "1. It is natural that baby eagles. .......to their mother", ar: "1. من الطبيعي أن صغار النسور. .......لأمهم." },
+                            options: [
+                                { text: "While still in the nest do submits.", value: "a" },
+                                { text: "While still in the nest are submitted", value: "b" },
+                                { text: "While still in the nest submit", value: "submit" },
+                                { text: "While still in the nest submits.", value: "d" }
+                            ],
+                            answer: "submit",
+                            explanation: { en: "The subject 'baby eagles' is plural, so the verb must be plural ('submit'). The phrase 'It is natural that...' requires a subjunctive mood or a simple present for general truths.", ar: "الفاعل 'baby eagles' جمع، لذا يجب أن يكون الفعل جمعًا ('submit'). تتطلب عبارة 'It is natural that...' صيغة الشرط أو المضارع البسيط للحقائق العامة." }
+                        },
+                        {
+                            id: 'sva_quiz_2', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "2. Public discussion of our international and domestic problems................by congressmen who are actually interested only in re-election.", ar: "2. النقاش العام حول مشاكلنا الدولية والمحلية................من قبل أعضاء الكونغرس الذين يهتمون فقط بإعادة انتخابهم." },
+                            options: [
+                                { text: "is being over-politicized", value: "is being over-politicized" },
+                                { text: "are being over-politicized", value: "b" },
+                                { text: "to be over-politicized", value: "c" },
+                                { text: "overly politicized.", value: "d" }
+                            ],
+                            answer: "is being over-politicized",
+                            explanation: { en: "The subject is 'Public discussion' (singular). The action is ongoing and in passive voice, so 'is being over-politicized' is correct.", ar: "الفاعل هو 'Public discussion' (مفرد). الفعل مستمر وفي صيغة المبني للمجهول، لذا 'is being over-politicized' صحيح." }
+                        },
+                        {
+                            id: 'sva_quiz_3', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "3. Several members of the president's immediate family.. .......entitled to protection by the Secret Service.", ar: "3. العديد من أفراد عائلة الرئيس المقربين.. .......مؤهلون للحماية من قبل الخدمة السرية." },
+                            options: [
+                                { text: "is", value: "a" },
+                                { text: "are", value: "are" },
+                                { text: "be", value: "c" },
+                                { text: "being", value: "d" }
+                            ],
+                            answer: "are",
+                            explanation: { en: "The subject is 'Several members' (plural).", ar: "الفاعل هو 'Several members' (جمع)." }
+                        },
+                        {
+                            id: 'sva_quiz_4', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "4. In spite of its historical significance, the library's exhibit of rare books........attracting little attention.", ar: "4. على الرغم من أهميتها التاريخية، معرض المكتبة للكتب النادرة........يجذب اهتمامًا قليلًا." },
+                            options: [
+                                { text: "is", value: "is" },
+                                { text: "are", value: "b" },
+                                { text: "be", value: "c" },
+                                { text: "being", value: "d" }
+                            ],
+                            answer: "is",
+                            explanation: { en: "The subject is 'the library's exhibit' (singular).", ar: "الفاعل هو 'the library's exhibit' (مفرد)." }
+                        }
+                    ]
+                },
+                prepositions: {
+                    title: { en: "Prepositions", ar: "حروف الجر" },
+                    content: [
+                        { type: 'paragraph', en: "A preposition is a word governing, and usually coming in front of a noun, pronoun, and expressing a relation to another word or element. A noun follows a preposition. It is never followed by a verb. The prepositions in English are: Aboard, about, above, across, after, against, along, amid, among, anti, around, as, at, before, behind, below, beneath, beside, besides, between, beyond, but, by, concerning, considering, despite, down, during, except, excepting, excluding, following, for, from, in, inside, into, like, minus, near, of, off, on, onto, opposite, outside, over, past, per, plus, regarding, round, save, since, than, through, to, toward, towards, under, underneath, unlike, until, up, upon, versus, via, with, within, without.", ar: "حرف الجر هو كلمة تحكم الاسم أو الضمير الذي يأتي بعدها، وتعبر عن علاقة بكلمة أو عنصر آخر. لا يتبع حرف الجر أبدًا فعل. حروف الجر في اللغة الإنجليزية هي: Aboard, about, above, across, after, against, along, amid, among, anti, around, as, at, before, behind, below, beneath, beside, besides, between, beyond, but, by, concerning, considering, despite, down, during, except, excepting, excluding, following, for, from, in, inside, into, like, minus, near, of, off, on, onto, opposite, outside, over, past, per, plus, regarding, round, save, since, than, through, to, toward, towards, under, underneath, unlike, until, up, upon, versus, via, with, within, without." },
+                        { type: 'subheading', en: "Prepositions of Place", ar: "حروف جر المكان" },
+                        { type: 'text', en: "At for a point; In for enclosed space; On for a surface.", ar: "At لنقطة محددة؛ In للمساحة المغلقة؛ On للسطح." },
+                        { type: 'example', en: ["At: At the corner, At the bus stop, At the door, At the top of the page, At the end of the road, At the entrance, At the crossroads.", "In: In the garden, In London, In France, In a box, In my pocket, In my wallet, In a building, In a car.", "On: On the wall, On the ceiling, On the door, On the cover, On the floor, On the carpet, On the menu, On a page."], ar: ["At: في الزاوية، في محطة الحافلات، عند الباب، في أعلى الصفحة، في نهاية الطريق، عند المدخل، عند مفترق الطرق.", "In: في الحديقة، في لندن، في فرنسا، في صندوق، في جيبي، في محفظتي، في مبنى، في سيارة.", "On: على الحائط، على السقف، على الباب، على الغلاف، على الأرض، على السجادة، في القائمة، في صفحة."] },
+                        { type: 'subheading', en: "Prepositions of Time", ar: "حروف جر الزمان" },
+                        { type: 'text', en: "At for precise time; In for months, years, centuries, and long periods; On for days and dates.", ar: "At لوقت محدد؛ In للأشهر، السنوات، القرون، والفترات الطويلة؛ On للأيام والتواريخ." },
+                        { type: 'example', en: ["At: At 3 o'clock, At 10.30 a.m, At noon, At dinnertime, At bedtime, At sunrise, At sunset, At the moment, At night, At the weekend, At Christmas, At the same time, At present.", "In: In May, In summer, In the summer, In 1990, In the 1990s, In the next century, In the past/future, In the evening, morning, afternoon.", "On: On Sunday, On Tuesdays, On 6 March, On 25 Dec. 2010, On Christmas Day, On Independence Day, On my birthday, On New Year's Eve, On Tuesday morning, On Sunday evening."], ar: ["At: في الساعة 3، في الساعة 10:30 صباحًا، عند الظهر، وقت العشاء، وقت النوم، عند شروق الشمس، عند غروب الشمس، في هذه اللحظة، في الليل، في عطلة نهاية الأسبوع، في عيد الميلاد، في نفس الوقت، في الوقت الحاضر.", "In: في مايو، في الصيف، في صيف عام 1990، في التسعينيات، في القرن القادم، في الماضي/المستقبل، في المساء، الصباح، بعد الظهر.", "On: يوم الأحد، أيام الثلاثاء، في 6 مارس، في 25 ديسمبر 2010، في يوم عيد الميلاد، في يوم الاستقلال، في عيد ميلادي، في ليلة رأس السنة، صباح الثلاثاء، مساء الأحد."] },
+                        { type: 'subheading', en: "Other Important Prepositions", ar: "حروف جر أخرى هامة" },
+                        { type: 'list', en: ["For: used with periods of time to show how long an action lasts (I have lived here for three years).", "Since: used with a point of time in the past from which some action began and continues until the time of speaking (I have lived here since 1960).", "Between: used with two persons or things or any two of a large number, or the speaker and a group (She is sitting between John and David).", "Among: used with more than two people or things and has a less exact meaning of place (She is sitting among her classmates).", "At: used to show the exact point (She studies at Amman Arab University for Graduate Studies).", "In: has the idea of within a larger area and is consequently used with bigger towns, valleys, and countries (in Jordan, in Jordan Valley, in Amman)."], ar: ["For: تستخدم مع فترات زمنية لإظهار مدة الفعل (لقد عشت هنا لمدة ثلاث سنوات).", "Since: تستخدم مع نقطة زمنية في الماضي بدأ منها الفعل واستمر حتى وقت الكلام (لقد عشت هنا منذ عام 1960).", "Between: تستخدم مع شخصين أو شيئين أو أي اثنين من عدد كبير، أو المتحدث ومجموعة (هي جالسة بين جون وديفيد).", "Among: تستخدم مع أكثر من شخصين أو شيئين ولها معنى مكان أقل دقة (هي جالسة بين زملائها في الفصل).", "At: تستخدم لإظهار النقطة الدقيقة (هي تدرس في جامعة عمان العربية للدراسات العليا).", "In: تعطي فكرة داخل منطقة أكبر وبالتالي تستخدم مع المدن الكبيرة، الوديان، والبلدان (في الأردن، في وادي الأردن، في عمان)."] },
+                        { type: 'subheading', en: "Verbs + Preposition Combinations", ar: "تركيبات الأفعال مع حروف الجر" },
+                        { type: 'list', en: ["AGAINST: react against (e.g., He reacted against the unfair treatment he received from his colleagues.)", "AT: stare at (e.g., He stared at his food.), hint at (e.g., He hinted at his plans to leave the company.)", "FOR: apologize for, blame for, excuse for, fight for, pay for, pray for, substitute for, thank for, vote for.", "FROM: distinguish from, emerge from, escape from, hide from, obtain from, prevent from, prohibit from, recover from, rescue from, stop from, suffer from.", "IN: believe in, excel in, invest in, participate in, result in, succeed in.", "OF: accuse of, think of.", "ON: bet on, insist on.", "TO: belong to, contribute to, lead to, object to, respond to.", "WITH: associate with, cover with, provide with, sympathize with."], ar: ["AGAINST: يتفاعل ضد (مثال: He reacted against the unfair treatment he received from his colleagues. - لقد تفاعل ضد المعاملة غير العادلة التي تلقاها من زملائه.)", "AT: يحدق في (مثال: He stared at his food. - لقد حدق في طعامه.)، يلمح إلى (مثال: He hinted at his plans to leave the company. - لقد ألمح إلى خططه لمغادرة الشركة.)", "FOR: يعتذر عن، يلوم على، يعذر على، يقاتل من أجل، يدفع ثمن، يصلي من أجل، يحل محل، يحل محل، يشكر على، يصوت لـ.", "FROM: يميز من، يظهر من، يهرب من، يختبئ من، يحصل من، يمنع من، يحظر من، يتعافى من، ينقذ من، يوقف من، يعاني من.", "IN: يؤمن بـ، يتفوق في، يستثمر في، يشارك في، ينتج عنه، ينجح في.", "OF: يتهم بـ، يفكر في.", "ON: يراهن على، يصر على.", "TO: ينتمي إلى، يساهم في، يؤدي إلى، يعترض على، يستجيب لـ.", "WITH: يرتبط بـ، يغطي بـ، يوفر لـ، يتعاطف مع."] },
+                        { type: 'subheading', en: "Adjective + Preposition Combinations", ar: "تركيبات الصفات مع حروف الجر" },
+                        { type: 'list', en: ["About: concerned about, confused about, excited about, worried about.", "Against: discriminated against (e.g., The employer discriminated against his female employees.).", "For: known for (e.g., Canadians are known for their humility.), prepared for, qualified for, remembered for, responsible for.", "From: absent from, different from.", "In: dressed in, interested in (e.g., I am interested in learning new languages.), involved in.", "To: limited to (e.g., It is not limited to this.), opposed to, polite to, related to, similar to, superior to, unrelated to, used to.", "With: acquainted with, annoyed with, associated with, bored with, content with, displeased with, dissatisfied with, done with, familiar with, filled with, furnished with, patient with, satisfied with, upset with, pleased with."], ar: ["About: قلق بشأن، مرتبك بشأن، متحمس بشأن، قلق بشأن.", "Against: تمييز ضد (مثال: The employer discriminated against his female employees. - صاحب العمل ميز ضد موظفاته.)", "For: معروف بـ (مثال: Canadians are known for their humility. - الكنديون معروفون بتواضعهم.)، مستعد لـ، مؤهل لـ، يتذكر بـ، مسؤول عن.", "From: غائب عن، مختلف عن.", "In: يرتدي، مهتم بـ (مثال: I am interested in learning new languages. - أنا مهتم بتعلم لغات جديدة.)، متورط في.", "To: محدود بـ (مثال: It is not limited to this. - لا يقتصر على هذا.)، معارض لـ، مهذب مع، مرتبط بـ، مشابه لـ، متفوق على، غير مرتبط بـ، معتاد على.", "With: على دراية بـ، منزعج من، مرتبط بـ، ملول من، راضٍ عن، غير راضٍ عن، انتهى من، مألوف بـ، مليء بـ، مفروش بـ، صبور مع، راضٍ عن، مستاء من، مسرور بـ."] }
+                    ],
+                    exercises: [
+                        {
+                            id: 'prep_quiz_1', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "1. Gelatin is a protein..........the skin, tendons, and bones of animals.", ar: "1. الجيلاتين هو بروتين..........جلد الحيوانات، الأوتار، والعظام." },
+                            options: [
+                                { text: "obtained by", value: "a" },
+                                { text: "obtained from", value: "obtained from" },
+                                { text: "obtained in", value: "c" },
+                                { text: "obtained of", value: "d" }
+                            ],
+                            answer: "obtained from",
+                            explanation: { en: "'Obtained from' is the correct prepositional phrase to indicate the source or origin.", ar: "'Obtained from' هي العبارة الحرفية الصحيحة للإشارة إلى المصدر أو الأصل." }
+                        },
+                        {
+                            id: 'prep_quiz_2', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "2. Stop complaining.............the noise.", ar: "2. توقف عن الشكوى.............الضوضاء." },
+                            options: [
+                                { text: "from", value: "a" },
+                                { text: "of", value: "of" },
+                                { text: "in", value: "c" },
+                                { text: "off", value: "d" }
+                            ],
+                            answer: "of",
+                            explanation: { en: "'Complain of' is the correct idiom when complaining about a problem or condition.", ar: "'Complain of' هو التعبير الاصطلاحي الصحيح عند الشكوى من مشكلة أو حالة." }
+                        },
+                        {
+                            id: 'prep_quiz_3', type: 'multipleChoice',
+                            instruction: { en: "Choose the correct option:", ar: "اختر الخيار الصحيح:" },
+                            question: { en: "3. Bette Davis was known throughout the world............her alluring eyes.", ar: "3. اشتهرت بيتي ديفيس في جميع أنحاء العالم............عيونها الفاتنة." },
+                            options: [
+                                { text: "from", value: "a" },
+                                { text: "for", value: "for" },
+                                { text: "of", value: "c" },
+                                { text: "off", value: "d" }
+                            ],
+                            answer: "for",
+                            explanation: { en: "'Known for' is the correct prepositional phrase to indicate the reason or characteristic for which someone is known.", ar: "'Known for' هي العبارة الحرفية الصحيحة للإشارة إلى السبب أو السمة التي يشتهر بها شخص ما." }
+                        }
+                    ]
+                },
+                articles: {
+                    title: { en: "Articles", ar: "أدوات التعريف والتنكير" },
+                    content: [
+                        { type: 'paragraph', en: "The rules for the correct use of articles (a, an, the) in English are difficult to master, but very interesting to learn. The reason that the article system is so hard for a nonnative speaker of English to understand fully is that the correct use of articles is very closely connected to subtle differences in meaning that English speakers are trying to convey.", ar: "قواعد الاستخدام الصحيح لأدوات التعريف والتنكير (a, an, the) في اللغة الإنجليزية صعبة الإتقان، ولكنها ممتعة للتعلم. السبب في صعوبة فهم نظام أدوات التعريف والتنكير بشكل كامل لمتحدثي اللغة الإنجليزية غير الأصليين هو أن الاستخدام الصحيح لأدوات التعريف والتنكير يرتبط ارتباطًا وثيقًا بالفروق الدقيقة في المعنى التي يحاول المتحدثون باللغة الإنجليزية إيصالها." },
+                        { type: 'subheading', en: "Rules for Articles", ar: "قواعد أدوات التعريف والتنكير" },
+                        { type: 'list', en: ["1. All singular count nouns must be modified by a determiner (e.g., a, an, the, this, that, my, your).", "2. A and An are used only with singular nouns (e.g., a car, an apple, an orange, an egg).", "3. An expression of definite quantity in the singular is usually preceded by a/an (e.g., a mile, a quart, a pound, a dozen, and a ton).", "4. No article is used in English with noncount nouns when they refer to general concepts of the noun (e.g., Freedom is our most important possession; Gold makes a wonderful gift for a person you love). But if the noncount noun is followed by a descriptive adjective clause or phrase, we use the article 'the' (e.g., The freedom that Thomas Jefferson envisioned is very different from the kind of freedom we have today; He could buy a car with all the gold in his teeth; The sugar that he had bought the previous day was covered with arms).", "5. 'The' is used with certain proper noun names of rivers, lakes, mountains, etc. (e.g., The Mississippi River, The Nile River, The Rocky Mountains, The Pacific Ocean, The Hawaiian Islands, The Caribbean Sea, The Amazon jungle).", "6. When a proper noun is used as a modifier for another noun, 'the' always precedes the proper noun (e.g., The Smith's house, The Egyptian pharaohs, The European Community).", "7. 'The' always precedes 'same' (e.g., This story is almost exactly the same as a story I read last year by a different author)."], ar: ["1. يجب تعديل جميع الأسماء المعدودة المفردة بواسطة محدد (مثل a, an, the, this, that, my, your).", "2. تستخدم A و An فقط مع الأسماء المفردة (مثل a car, an apple, an orange, an egg).", "3. عادة ما تسبق تعبيرات الكمية المحددة في المفرد بـ a/an (مثل a mile, a quart, a pound, a dozen, and a ton).", "4. لا تستخدم أداة تعريف في اللغة الإنجليزية مع الأسماء غير المعدودة عندما تشير إلى مفاهيم عامة للاسم (مثل Freedom is our most important possession; Gold makes a wonderful gift for a person you love). ولكن إذا تبع الاسم غير المعدود عبارة وصفية أو عبارة صفة، فإننا نستخدم أداة التعريف 'the' (مثل The freedom that Thomas Jefferson envisioned is very different from the kind of freedom we have today; He could buy a car with all the gold in his teeth; The sugar that he had bought the previous day was covered with arms).", "5. تستخدم 'The' مع بعض الأسماء العلم الخاصة بالأنهار، البحيرات، الجبال، إلخ (مثل The Mississippi River, The Nile River, The Rocky Mountains, The Pacific Ocean, The Hawaiian Islands, The Caribbean Sea, The Amazon jungle).", "6. عندما يستخدم اسم علم كمعدّل لاسم آخر، تسبق 'the' دائمًا الاسم العلم (مثل The Smith's house, The Egyptian pharaohs, The European Community).", "7. تسبق 'The' دائمًا 'same' (مثل This story is almost exactly the same as a story I read last year by a different author)."] }
+                    ],
+                    exercises: [
+                        {
+                            id: 'art_ex1_1', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "1. Jason's father brought him _______ bicycle that he had wanted for his birthday.", ar: "1. والد جيسون أحضر له _______ دراجة كان يريدها لعيد ميلاده." },
+                            answer: "a",
+                            explanation: { en: "'Bicycle' is a singular count noun, and it's being introduced for the first time (indefinite).", ar: "'Bicycle' اسم معدود مفرد، ويتم تقديمه لأول مرة (غير معرف)." }
+                        },
+                        {
+                            id: 'art_ex1_2', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "2. _______ Statue of Liberty was a gift of friendship from _______ France to _______ United States.", ar: "2. _______ تمثال الحرية كان هدية صداقة من _______ فرنسا إلى _______ الولايات المتحدة." },
+                            answer: ["The", "", "the"],
+                            multiPart: true,
+                            explanation: { en: "'Statue of Liberty' is a specific landmark, so 'the'. 'France' is a proper noun (country), so no article. 'United States' is a country name that always takes 'the'.", ar: "'Statue of Liberty' معلم محدد، لذا 'the'. 'France' اسم علم (دولة)، لذا لا توجد أداة تعريف. 'United States' اسم دولة يأخذ دائمًا 'the'." }
+                        },
+                        {
+                            id: 'art_ex1_3', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "3. Rita is studying _______ English and _______ math this semester.", ar: "3. ريتا تدرس _______ اللغة الإنجليزية و _______ الرياضيات هذا الفصل الدراسي." },
+                            answer: ["", ""],
+                            multiPart: true,
+                            explanation: { en: "'English' and 'math' are names of subjects/languages, generally used without articles.", ar: "'English' و 'math' أسماء مواد/لغات، تستخدم عادة بدون أدوات تعريف." }
+                        },
+                        {
+                            id: 'art_ex1_4', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "4. _______ Judge asked _______ witness to tell _______ truth.", ar: "4. _______ القاضي طلب من _______ الشاهد أن يقول _______ الحقيقة." },
+                            answer: ["The", "the", "the"],
+                            multiPart: true,
+                            explanation: { en: "Specific judge, specific witness, and 'truth' is often used with 'the' in this context.", ar: "قاضٍ محدد، شاهد محدد، و 'truth' غالبًا ما تستخدم مع 'the' في هذا السياق." }
+                        },
+                        {
+                            id: 'art_ex1_5', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "5. Please give me _______ cup of _______ coffee with _______ cream and _______ sugar.", ar: "5. من فضلك أعطني _______ كوب من _______ القهوة مع _______ الكريمة و _______ السكر." },
+                            answer: ["a", "", "", ""],
+                            multiPart: true,
+                            explanation: { en: "'Cup' is singular count, indefinite. 'Coffee,' 'cream,' and 'sugar' are noncount nouns used in a general sense.", ar: "'Cup' اسم معدود مفرد، غير معرف. 'Coffee' و 'cream' و 'sugar' أسماء غير معدودة تستخدم بمعنى عام." }
+                        },
+                        {
+                            id: 'art_ex1_6', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "6. There are only _______ few seats left for _______ tonight's musical at _______ university.", ar: "6. لم يتبق سوى _______ عدد قليل من المقاعد لـ _______ عرض الليلة الموسيقي في _______ الجامعة." },
+                            answer: ["a", "", "the"],
+                            multiPart: true,
+                            explanation: { en: "'A few' is an idiom for 'some.' 'Tonight's musical' is specific, but 'musical' itself is indefinite here. 'University' takes 'the' when referring to a specific institution or generally.", ar: "'A few' تعبير اصطلاحي يعني 'قليل'. 'Tonight's musical' محدد، ولكن 'musical' نفسه غير معرف هنا. 'University' تأخذ 'the' عند الإشارة إلى مؤسسة محددة أو بشكل عام." }
+                        },
+                        {
+                            id: 'art_ex1_7', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "7. Louie played _______ basketball and _______ baseball.", ar: "7. لوي لعب _______ كرة السلة و _______ البيسبول." },
+                            answer: ["", ""],
+                            multiPart: true,
+                            explanation: { en: "Names of sports are generally used without articles.", ar: "أسماء الرياضات تستخدم عادة بدون أدوات تعريف." }
+                        },
+                        {
+                            id: 'art_ex1_8', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "8. David attended _______ Princeton University. Harry has been admitted to _______ School of Medicine Midwestern University.", ar: "8. ديفيد التحق بـ _______ جامعة برينستون. هاري قُبل في _______ كلية الطب بجامعة ميدويسترن." },
+                            answer: ["", ""],
+                            multiPart: true,
+                            explanation: { en: "Proper names of universities and specific schools within them generally do not take articles.", ar: "أسماء الجامعات والأقسام المحددة داخلها لا تأخذ عادة أدوات تعريف." }
+                        },
+                        {
+                            id: 'art_ex1_9', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "9. David attended _______ Boys' Club this year.", ar: "9. ديفيد التحق بـ _______ نادي الأولاد هذا العام." },
+                            answer: "the",
+                            explanation: { en: "Assuming 'Boys' Club' is a specific, well-known institution or club, it would take 'the'.", ar: "بافتراض أن 'Boys' Club' هو مؤسسة أو نادٍ محدد ومعروف، فإنه سيأخذ 'the'." }
+                        },
+                        {
+                            id: 'art_ex1_10', type: 'fillInTheBlank',
+                            instruction: { en: "Supply the articles (a, an, the) if they are necessary. If no article is necessary, leave the space blank.", ar: "أدخل أدوات التعريف والتنكير (a, an, the) إذا كانت ضرورية. إذا لم تكن هناك حاجة لأي أداة، اترك الفراغ فارغًا." },
+                            question: { en: "10. On our trip to _______ Spain, we crossed _______ Atlantic Ocean.", ar: "10. في رحلتنا إلى _______ إسبانيا، عبرنا _______ المحيط الأطلسي." },
+                            answer: ["", "the"],
+                            multiPart: true,
+                            explanation: { en: "'Spain' is a proper noun (country), so no article. 'Atlantic Ocean' is a specific ocean, so 'the'.", ar: "'Spain' اسم علم (دولة)، لذا لا توجد أداة تعريف. 'Atlantic Ocean' محيط محدد، لذا 'the'." }
+                        },
+                        {
+                            id: 'art_quiz_1', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "1. There is nothing quite..............sleeping under the stars.", ar: "1. لا يوجد شيء يضاهي..............النوم تحت النجوم." },
+                            options: [
+                                { text: "the same as", value: "the same as" },
+                                { text: "as the same", value: "b" },
+                                { text: "different than the", value: "c" },
+                                { text: "as same a", value: "d" }
+                            ],
+                            answer: "the same as",
+                            explanation: { en: "'The same as' is the correct idiom for comparison of equality.", ar: "'The same as' هو التعبير الاصطلاحي الصحيح للمقارنة المتساوية." }
+                        },
+                        {
+                            id: 'art_quiz_2', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "2. Wild animals are endangered not only by.........predators, pollution, and the many collectors of zoo specimens who encroach on their territory.", ar: "2. الحيوانات البرية مهددة بالانقراض ليس فقط بسبب.........المفترسات، التلوث، والعديد من جامعي عينات حدائق الحيوان الذين يتعدون على أراضيها." },
+                            options: [
+                                { text: "a hunting but also", value: "a" },
+                                { text: "a hunting but also", value: "b" },
+                                { text: "hunting but also", value: "hunting but also" },
+                                { text: "an hunt but also", value: "d" }
+                            ],
+                            answer: "hunting but also",
+                            explanation: { en: "'Hunting' here is a gerund acting as a general activity, so no article is needed.", ar: "'Hunting' هنا هو اسم فعل يعمل كنشاط عام، لذا لا توجد حاجة لأداة تعريف." }
+                        },
+                        {
+                            id: 'art_quiz_3', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "3. When the weather is pleasant in New York, it is.........on earth.", ar: "3. عندما يكون الطقس لطيفًا في نيويورك، فإنها.........على الأرض." },
+                            options: [
+                                { text: "finest place", value: "a" },
+                                { text: "the finest place", value: "the finest place" },
+                                { text: "the finest place", value: "c" },
+                                { text: "finer place", value: "d" }
+                            ],
+                            answer: "the finest place",
+                            explanation: { en: "'Finest' is a superlative, which requires 'the'.", ar: "'Finest' هي صيغة تفضيل، تتطلب 'the'." }
+                        },
+                        {
+                            id: 'art_quiz_4', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "4. Some of Charles Dickens's novels were originally published.........", ar: "4. بعض روايات تشارلز ديكنز نُشرت في الأصل........." },
+                            options: [
+                                { text: "in magazines", value: "in magazines" },
+                                { text: "on magazines", value: "b" },
+                                { text: "at magazines", value: "c" },
+                                { text: "as is magazines", value: "d" }
+                            ],
+                            answer: "in magazines",
+                            explanation: { en: "'In magazines' is the correct prepositional phrase for published works.", ar: "'In magazines' هي العبارة الحرفية الصحيحة للأعمال المنشورة." }
+                        },
+                        {
+                            id: 'art_quiz_5', type: 'multipleChoice',
+                            instruction: { en: "Multiple choice quiz:", ar: "اختبار متعدد الخيارات:" },
+                            question: { en: "5. Low-fat yogurt contains..........in order to keep the number of calories from fat to a minimum.", ar: "5. الزبادي قليل الدسم يحتوي على..........للحفاظ على عدد السعرات الحرارية من الدهون إلى الحد الأدنى." },
+                            options: [
+                                { text: "the skimmed milk", value: "a" },
+                                { text: "a skimmed milk", value: "b" },
+                                { text: "skimmed milk", value: "skimmed milk" },
+                                { text: "skimming milk", value: "d" }
+                            ],
+                            answer: "skimmed milk",
+                            explanation: { en: "'Skimmed milk' is a noncount noun used in a general sense, so no article is needed.", ar: "'Skimmed milk' هو اسم غير معدود يستخدم بمعنى عام، لذا لا توجد حاجة لأداة تعريف." }
+                        }
+                    ]
+                }
+            }
+        };
+
+        const mainContent = document.getElementById('main-content');
+        const lessonTitleEl = document.getElementById('lesson-title');
+        const lessonContentArea = document.getElementById('lesson-content-area');
+        const languageToggleButton = document.getElementById('language-toggle');
+        const appContainer = document.getElementById('app-container');
+        const navTitle = document.getElementById('nav-title');
+        const navLinks = document.querySelectorAll('#sidebar .nav-link');
+
+        function renderLesson(lessonId) {
+            const lesson = appData.lessons[lessonId];
+            if (!lesson) {
+                lessonTitleEl.textContent = appData.currentLanguage === 'ar' ? 'الدرس غير موجود' : 'Lesson not found';
+                lessonContentArea.innerHTML = '';
+                return;
+            }
+
+            lessonTitleEl.textContent = lesson.title[appData.currentLanguage];
+            let contentHtml = '';
+
+            lesson.content.forEach(item => {
+                let bilingualText;
+                if (item.type === 'example') {
+                    const examples = Array.isArray(item.en) ? item.en : [item.en];
+                    const arExamples = Array.isArray(item.ar) ? item.ar : [item.ar];
+                    contentHtml += `<div class="example my-4"><strong>${appData.currentLanguage === 'ar' ? 'أمثلة:' : 'Examples:'}</strong><ul class="list-disc list-inside ${appData.currentLanguage === 'ar' ? 'pr-4' : 'pl-4'}">`;
+                    examples.forEach((ex, index) => {
+                        contentHtml += `<li><span class="${appData.currentLanguage === 'en' ? 'text-left' : 'text-right'}">${ex}</span> <span class="block text-xs text-slate-500 mt-1 ${appData.currentLanguage === 'ar' ? 'text-right' : 'text-left'}">(${arExamples[index] || ''})</span></li>`;
+                    });
+                    contentHtml += `</ul></div>`;
+                } else if (item.type === 'list') {
+                    const items = Array.isArray(item.en) ? item.en : [item.en];
+                    const arItems = Array.isArray(item.ar) ? item.ar : [item.ar];
+                    contentHtml += `<ul class="list-disc ${appData.currentLanguage === 'ar' ? 'list-inside pr-5' : 'list-inside pl-5'} space-y-1 mb-4">`;
+                    items.forEach((li, index) => {
+                        contentHtml += `<li><span class="${appData.currentLanguage === 'en' ? 'text-left' : 'text-right'}">${li}</span> <span class="block text-xs text-slate-500 mt-1 ${appData.currentLanguage === 'ar' ? 'text-right' : 'text-left'}">(${arItems[index] || ''})</span></li>`;
+                    });
+                    contentHtml += `</ul>`;
+                } else if (item.type === 'table') {
+                    const tableData = item.en;
+                    const arTableData = item.ar;
+                    contentHtml += `<div class="overflow-x-auto my-4"><table class="min-w-full divide-y divide-gray-200 shadow-sm rounded-lg"><thead><tr>`;
+                    tableData[0].forEach((header, i) => {
+                        contentHtml += `<th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${appData.currentLanguage === 'ar' ? arTableData[0][i] : header}</th>`;
+                    });
+                    contentHtml += `</tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
+                    for (let i = 1; i < tableData.length; i++) {
+                        contentHtml += `<tr>`;
+                        tableData[i].forEach((cell, j) => {
+                            contentHtml += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${appData.currentLanguage === 'ar' ? arTableData[i][j] : cell}</td>`;
+                        });
+                        contentHtml += `</tr>`;
+                    }
+                    contentHtml += `</tbody></table></div>`;
+                }
+                else {
+                    const textContent = Array.isArray(item.en) ? item.en.join('<br>') : item.en;
+                    const arTextContent = Array.isArray(item.ar) ? item.ar.join('<br>') : item.ar;
+                    
+                    if (appData.currentLanguage === 'ar') {
+                        bilingualText = `<p class="text-right">${arTextContent}</p><p class="text-left text-sm text-slate-600 mt-1">${textContent}</p>`;
+                    } else {
+                        bilingualText = `<p class="text-left">${textContent}</p><p class="text-right text-sm text-slate-600 mt-1">${arTextContent}</p>`;
+                    }
+
+                    if (item.type === 'paragraph') {
+                        contentHtml += `<div class="mb-4">${bilingualText}</div>`;
+                    } else if (item.type === 'text') {
+                        contentHtml += `<div class="mb-2">${bilingualText}</div>`;
+                    } else if (item.type === 'subheading') {
+                        contentHtml += `<h3 class="${appData.currentLanguage === 'ar' ? 'text-right' : 'text-left'} text-sky-600">${item[appData.currentLanguage]}</h3>`;
+                    }
+                }
+            });
+
+            if (lesson.exercises && lesson.exercises.length > 0) {
+                contentHtml += `<h3 class="${appData.currentLanguage === 'ar' ? 'text-right' : 'text-left'} text-sky-600 mt-8 mb-4">${appData.currentLanguage === 'ar' ? 'تمارين:' : 'Exercises:'}</h3>`;
+                lesson.exercises.forEach((ex, index) => {
+                    contentHtml += `<div class="exercise-item" id="${ex.id}">`;
+                    contentHtml += `<p class="font-semibold mb-2 ${appData.currentLanguage === 'ar' ? 'text-right' : 'text-left'}">${ex.instruction[appData.currentLanguage]}</p>`;
+                    
+                    let questionTextEn = ex.question.en;
+                    let questionTextAr = ex.question.ar;
+
+                    if (ex.type === 'fillInTheBlank') {
+                        let finalQEn = questionTextEn;
+                        let finalQAr = questionTextAr;
+                        
+                        if (ex.multiPart) {
+                            let enParts = questionTextEn.split("_______");
+                            let arParts = questionTextAr.split("_______");
+                            finalQEn = "";
+                            finalQAr = "";
+                            enParts.forEach((part, i) => {
+                                finalQEn += part;
+                                if (i < enParts.length - 1) {
+                                    finalQEn += `<input type="text" data-exid="${ex.id}" data-part="${i}" class="border-slate-300 rounded-md shadow-sm p-1 mx-1 w-32 focus:ring-sky-500 focus:border-sky-500 text-left">`;
+                                }
+                            });
+                             arParts.forEach((part, i) => {
+                                finalQAr += part;
+                                if (i < arParts.length - 1) {
+                                    finalQAr += `<input type="text" data-exid="${ex.id}" data-part="${i}" class="border-slate-300 rounded-md shadow-sm p-1 mx-1 w-32 focus:ring-sky-500 focus:border-sky-500 text-right">`;
+                                }
+                            });
+
+                        } else {
+                            finalQEn = questionTextEn.replace('_______', `<input type="text" data-exid="${ex.id}" class="border-slate-300 rounded-md shadow-sm p-1 mx-1 w-40 focus:ring-sky-500 focus:border-sky-500 text-left">`);
+                            finalQAr = questionTextAr.replace('_______', `<input type="text" data-exid="${ex.id}" class="border-slate-300 rounded-md shadow-sm p-1 mx-1 w-40 focus:ring-sky-500 focus:border-sky-500 text-right">`);
+                        }
+                        
+                        contentHtml += `<p class="text-left">${finalQEn} <span class="block text-xs text-slate-500 mt-1 text-right">(${finalQAr})</span></p>`;
+
+                    } else if (ex.type === 'multipleChoice') {
+                        contentHtml += `<p class="text-left mb-2">${questionTextEn} <span class="block text-xs text-slate-500 mt-1 text-right">(${questionTextAr})</span></p>`;
+                        contentHtml += `<div class="space-y-1 text-left">`;
+                        ex.options.forEach(opt => {
+                            contentHtml += `<div><label class="inline-flex items-center"><input type="radio" name="${ex.id}" value="${opt.value}" data-exid="${ex.id}" class="form-radio text-sky-600 focus:ring-sky-500"> <span class="ml-2">${opt.text}</span></label></div>`;
+                        });
+                        contentHtml += `</div>`;
+                    }
+                    contentHtml += `<div class="mt-3 flex gap-2 ${appData.currentLanguage === 'ar' ? 'justify-end' : 'justify-start'}">`;
+                    contentHtml += `<button onclick="checkAnswer('${ex.id}')" class="bg-sky-600 hover:bg-sky-700 text-white py-1 px-3 rounded-md text-sm">${appData.currentLanguage === 'ar' ? 'تحقق من الإجابة' : 'Check Answer'}</button>`;
+                    contentHtml += `<button onclick="showSolution('${ex.id}')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 py-1 px-3 rounded-md text-sm">${appData.currentLanguage === 'ar' ? 'أظهر الحل' : 'Show Solution'}</button>`;
+                    contentHtml += `</div>`;
+                    contentHtml += `<div id="feedback-${ex.id}" class="feedback mt-2"></div>`;
+                    contentHtml += `<div id="solution-${ex.id}" class="solution mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md text-sm hidden"><strong>${appData.currentLanguage === 'ar' ? 'الحل:' : 'Solution:'}</strong> <span class="font-mono">${Array.isArray(ex.answer) ? ex.answer.join(', ') : ex.answer}</span>. <span class="block text-xs text-slate-700 mt-1">${ex.explanation.en} <span class="text-slate-500">(${ex.explanation.ar})</span></span></div>`;
+                    contentHtml += `</div>`;
+                });
+            }
+
+            lessonContentArea.innerHTML = contentHtml;
+            updateActiveNavLink(lessonId);
+            // Re-apply RTL/LTR for inputs after rendering
+            if (appData.currentLanguage === 'ar') {
+                document.querySelectorAll('.exercise-item input[type="text"]').forEach(input => {
+                    input.classList.remove('text-left');
+                    input.classList.add('text-right');
+                });
+            } else {
+                document.querySelectorAll('.exercise-item input[type="text"]').forEach(input => {
+                    input.classList.remove('text-right');
+                    input.classList.add('text-left');
+                });
+            }
+        }
+
+        function updateActiveNavLink(activeLessonId) {
+            navLinks.forEach(link => {
+                if (link.dataset.lessonid === activeLessonId) {
+                    link.classList.add('active-nav-link');
+                } else {
+                    link.classList.remove('active-nav-link');
+                }
+            });
+        }
+        
+        window.checkAnswer = function(exerciseId) {
+            const exercise = findExercise(exerciseId);
+            const feedbackEl = document.getElementById(`feedback-${exerciseId}`);
+            let isCorrect = false;
+
+            if (exercise.type === 'fillInTheBlank') {
+                if (exercise.multiPart) {
+                    let correctParts = 0;
+                    const inputs = document.querySelectorAll(`input[data-exid="${exerciseId}"]`);
+                    inputs.forEach((input, index) => {
+                        if (input.value.trim().toLowerCase() === exercise.answer[index].toLowerCase()) {
+                            correctParts++;
+                        }
+                    });
+                    isCorrect = correctParts === exercise.answer.length;
+                } else {
+                    const input = document.querySelector(`input[data-exid="${exerciseId}"]`);
+                    isCorrect = input.value.trim().toLowerCase() === exercise.answer.toLowerCase();
+                }
+            } else if (exercise.type === 'multipleChoice') {
+                const selectedOption = document.querySelector(`input[name="${exerciseId}"]:checked`);
+                isCorrect = selectedOption && selectedOption.value === exercise.answer;
+            }
+
+            if (isCorrect) {
+                feedbackEl.textContent = appData.currentLanguage === 'ar' ? 'صحيح! 🎉' : 'Correct! 🎉';
+                feedbackEl.className = 'feedback correct';
+            } else {
+                feedbackEl.textContent = appData.currentLanguage === 'ar' ? 'حاول مرة أخرى. 🤔' : 'Try again. 🤔';
+                feedbackEl.className = 'feedback incorrect';
+            }
+            feedbackEl.classList.remove('hidden');
+            document.getElementById(`solution-${exerciseId}`).classList.add('hidden');
+        }
+
+        window.showSolution = function(exerciseId) {
+            const solutionEl = document.getElementById(`solution-${exerciseId}`);
+            solutionEl.classList.toggle('hidden');
+            document.getElementById(`feedback-${exerciseId}`).classList.add('hidden');
+        }
+
+        function findExercise(exerciseId) {
+            for (const lessonKey in appData.lessons) {
+                const lesson = appData.lessons[lessonKey];
+                if (lesson.exercises) {
+                    const foundEx = lesson.exercises.find(ex => ex.id === exerciseId);
+                    if (foundEx) return foundEx;
+                }
+            }
+            return null;
+        }
+
+        function toggleLanguage() {
+            appData.currentLanguage = appData.currentLanguage === 'ar' ? 'en' : 'ar';
+            document.documentElement.lang = appData.currentLanguage;
+            document.documentElement.dir = appData.currentLanguage === 'ar' ? 'rtl' : 'ltr';
+            
+            if (appData.currentLanguage === 'en') {
+                languageToggleButton.textContent = 'التبديل إلى العربية';
+                navTitle.textContent = 'Lessons Menu EN101';
+                navLinks.forEach(link => {
+                    const lesson = appData.lessons[link.dataset.lessonid];
+                    if(lesson) link.textContent = lesson.title.en;
+                    link.classList.remove('text-right');
+                    link.classList.add('text-left');
+                });
+            } else {
+                languageToggleButton.textContent = 'Switch to English';
+                navTitle.textContent = 'قائمة الدروس';
+                 navLinks.forEach(link => {
+                    const lesson = appData.lessons[link.dataset.lessonid];
+                    if(lesson) link.textContent = lesson.title.ar;
+                    link.classList.remove('text-left');
+                    link.classList.add('text-right');
+                });
+            }
+            const currentLessonId = document.querySelector('.active-nav-link')?.dataset.lessonid || 'verbTenses';
+            renderLesson(currentLessonId);
+        }
+
+        languageToggleButton.addEventListener('click', toggleLanguage);
+
+        document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                renderLesson(e.target.dataset.lessonid);
+            });
+        });
+        
+        renderLesson('verbTenses'); 
+    </script>
+</body>
+</html>
